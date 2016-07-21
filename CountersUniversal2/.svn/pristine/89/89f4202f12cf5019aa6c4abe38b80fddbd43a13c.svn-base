@@ -1,0 +1,179 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
+using Windows.UI.Popups;
+
+namespace Counters
+{
+    public sealed partial class AddData : MyToolkit.Paging.MtPage
+    {
+        QueryResult currentCounter;
+        AddDataParameter parameter;
+
+        public AddData()
+        {
+            this.InitializeComponent();
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
+        }
+
+        protected override void OnNavigatedTo(MyToolkit.Paging.MtNavigationEventArgs e)
+        {
+            try
+            {
+                parameter = e.Parameter as AddDataParameter;
+
+                if (parameter.DataId != 0)
+                    currentCounter = global.db.Query<QueryResult>(string.Format("select * from Counter join Tarif on Counter.TarifId=Tarif.TariffId"
+                        + " join CounterData on Counter.CounterId=CounterData.CounterId where Counter.CounterId={0} and CounterData.DataId={1}", parameter.CounterId, parameter.DataId)).Single();
+                else
+                    currentCounter = global.db.Query<QueryResult>(string.Format("select * from Counter join Tarif on Counter.TarifId=Tarif.TariffId"
+                        + " join CounterData on Counter.CounterId=CounterData.CounterId where Counter.CounterId={0} group by Counter.CounterId", parameter.CounterId)).Single();
+
+                if (parameter.ScoreId != 0 && currentCounter.EnableODN)
+                    grdODN.Visibility = Visibility.Visible;
+                tbTarif.Text = currentCounter.stringTariff;
+
+                if (e.NavigationMode != NavigationMode.Back)
+                {
+                    if (parameter.DataId != 0)
+                    {
+                        grdLastData.DataContext = global.db.Query<QueryResult>(string.Format("select * from Counter join CounterData on Counter.CounterId=CounterData.CounterId"
+                              + " join Tarif on CounterData.TariffId=Tarif.TariffId where Counter.CounterId={0} and CounterData.DataId<{1} group by Counter.CounterId", parameter.CounterId, parameter.DataId)).Single();
+                        tbDate.Date = currentCounter.Date;
+                        tbData.Text = currentCounter.Data.ToString();
+                        tbDataODN.Text = currentCounter.DataODN.ToString();
+                    }
+                    else
+                        grdLastData.DataContext = currentCounter;
+                }
+                Tag = currentCounter.Name;
+            }
+            catch
+            {
+                Frame.GoBackAsync();
+            }
+        }
+
+        private void btnChangeTarif_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            Frame.NavigateAsync(typeof(AddCounter), new AddCounterParameter()
+            {
+                CounterId = currentCounter.CounterId,
+                TarifId = currentCounter.TariffId
+            });
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            double data, odn;
+            // Если значение начинается со знака "+" - введена разница в показаниях
+            bool isDelta = !string.IsNullOrEmpty(tbData.Text) && tbData.Text[0] == '+';
+
+            if (!double.TryParse(tbData.Text.Replace('.', ','), out data))
+                invalidData("Поле содержит недопустимые символы", tbData);
+            else if (!double.TryParse(tbDataODN.Text.Replace('.', ','), out odn))
+                invalidData("Поле содержит недопустимые символы", tbDataODN);
+            else if (parameter.DataId == 0 && data < currentCounter.Data && !isDelta)
+                invalidData("Данные показания меньше предыдущих", tbData);
+            else
+            {
+                var counterToUpdate = global.db.Get<Counter>(parameter.CounterId);
+
+                // Редактирование показаний
+                if (parameter.DataId != 0)
+                {
+                    CounterData currentData = new CounterData()
+                    {
+                        DataId = currentCounter.DataId,
+                        CounterId = parameter.CounterId,
+                        ScoreId = parameter.ScoreId,
+                        Data = data,
+                        DataODN = odn,
+                        Delta = Math.Round(currentCounter.Delta + data - currentCounter.Data, 2),
+                        Date = tbDate.Date.Date,
+                        TariffId = counterToUpdate.TarifId,
+                    };
+                    SetSumm(currentData);
+                    global.db.Update(currentData);
+                }
+                // Добавление показаний
+                else
+                {
+                    CounterData newData = new CounterData()
+                    {
+                        CounterId = parameter.CounterId,
+                        ScoreId = parameter.ScoreId,
+                        Data = isDelta ? Math.Round(currentCounter.Data + data, 2) : data,
+                        DataODN = odn,
+                        Delta = isDelta ? data : Math.Round(data - currentCounter.Data, 2),
+                        Date = tbDate.Date.Date,
+                        TariffId = counterToUpdate.TarifId,
+                    };
+                    SetSumm(newData);
+                    global.db.Insert(newData);
+                }
+
+                Frame.GoBackAsync();
+            }
+        }
+
+        private void SetSumm(CounterData dataToUpdate)
+        {
+            string strSumm;
+            var fullSumm = Summ(dataToUpdate.Delta + dataToUpdate.DataODN, out strSumm);
+            var summWithoutODN = Summ(dataToUpdate.Delta, out strSumm);
+
+            dataToUpdate.stringSumm = strSumm;
+            dataToUpdate.Summ = Math.Round(summWithoutODN, 2);
+            dataToUpdate.SummODN = Math.Round(fullSumm - summWithoutODN, 2);
+        }
+
+        private double Summ(double delta, out string strSumm)
+        {
+            strSumm = "";
+            double summ1 = 0, summ2 = 0, summ3 = 0;
+            var limit1 = currentCounter.Limit1;
+            var limit2 = currentCounter.Limit2;
+            if (delta > limit2)
+            {
+                summ1 = (delta - limit2) * currentCounter.Tarif3;
+                delta = limit2;
+            }
+            if (delta > limit1 && currentCounter.TarifsCount > 1)
+            {
+                summ2 = (delta - limit1) * currentCounter.Tarif2;
+                delta = limit1;
+            }
+            if (currentCounter.TarifsCount > 2)
+                summ3 = delta * currentCounter.Tarif1;
+
+            var summs = new List<double> { summ3, summ2, summ1 };
+            if (summs.Count(s => s > 0) > 1)
+                strSumm = string.Join(" + ", summs.Where(s => s > 0).Select(s => Math.Round(s, 2).ToString()));
+
+            return summ1 + summ2 + summ3;
+        }
+
+        private void invalidData(string message, Control tbToFocus)
+        {
+            new MessageDialog(message).ShowAsync();
+            tbToFocus.Focus(FocusState.Programmatic);
+        }
+
+        private async void btnHelp_Click(object sender, RoutedEventArgs e)
+        {
+            await new MessageDialog("В поле ввода показаний возможно добавить абсолютное значение (показания счетчика) или относительное (разница между текущими показаниями и предыдущими) с ведущим знаком '+'.").ShowAsync();
+        }
+    }
+}

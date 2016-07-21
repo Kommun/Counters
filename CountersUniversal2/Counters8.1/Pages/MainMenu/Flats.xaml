@@ -1,0 +1,48 @@
+﻿<paging:MtPage
+    x:Class="Counters.Flats"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Counters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:paging="using:MyToolkit.Paging"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Tag="Квартиры">
+
+    <paging:MtPage.Resources>
+
+        <local:AppSettings x:Key="settings"/>
+
+        <DataTemplate x:Key="lbiFlat">
+            <Border Name="grdFlat" BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="0,10" Tapped="grdFlat_Tapped" Holding="grdFlat_Holding">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding Name}" FontSize="25" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Adress}" FontSize="20" TextWrapping="Wrap" Grid.Row="1"/>
+                </Grid>
+
+                <FlyoutBase.AttachedFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:Name="btnChange" Text="Изменить" Click="btnChange_Click"/>
+                        <MenuFlyoutItem x:Name="btnDelete" Text="Удалить" Click="btnDelete_Click"/>
+                    </MenuFlyout>
+                </FlyoutBase.AttachedFlyout>
+            </Border>
+        </DataTemplate>
+
+    </paging:MtPage.Resources>
+
+    <ListView Name="lbFlats" ItemTemplate="{StaticResource lbiFlat}"
+              ItemContainerStyle="{StaticResource selectionContainerStyle}"/>
+
+    <paging:MtPage.BottomAppBar>
+        <CommandBar>
+            <AppBarButton Name="btnAdd" Label="Добавить" Icon="Add" Click="btnAdd_Click"/>
+        </CommandBar>
+    </paging:MtPage.BottomAppBar>
+
+</paging:MtPage>

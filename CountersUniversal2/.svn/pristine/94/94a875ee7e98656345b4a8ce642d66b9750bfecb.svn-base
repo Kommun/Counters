@@ -1,0 +1,17 @@
+<XamlCompilerSaveState>
+  <ReferenceAssemblyList>
+    <LocalAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\counters8.1\obj\x86\debug\intermediatexaml\counters8.1.exe" HashGuid="9cae97eb-da8a-d5d3-bde3-b2af0e4bb682" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\backgroundtask\bin\x86\debug\backgroundtask.winmd" HashGuid="8da255fd-0b39-4145-7476-128f351ab8b2" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\counters8.1\bin\x86\debug\drawerlayout.dll" HashGuid="30107def-98bf-21e0-cab8-0bc7f46a8298" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\microsoft.applicationinsights.1.1.0\lib\portable-win81+wpa81\microsoft.applicationinsights.dll" HashGuid="184a8242-0b85-444e-2346-c2473c1d6ceb" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\microsoft.applicationinsights.windowsapps.1.1.0\lib\wpa81\microsoft.applicationinsights.extensibility.windows.dll" HashGuid="0cfd8f3d-feff-7167-8f6d-52f443177ca5" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\microsoft.applicationinsights.persistencechannel.1.1.0\lib\portable-win81+wpa81\microsoft.applicationinsights.persistencechannel.dll" HashGuid="983b187d-c490-3a7c-dca7-d8a8fa4d0cb1" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\livesdk.5.6.2\windowsxaml\microsoft.live.dll" HashGuid="129ce77c-af09-9d5d-b95e-bf89af6739c7" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\windowsazure.messaging.managed.0.1.7.9\lib\wpa81\microsoft.windowsazure.messaging.managed.dll" HashGuid="a6c77c87-a1d1-2c9f-340a-0958f7d05449" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\mytoolkit.2.3.31.0\lib\portable-net45+wp8+win8+wpa81\mytoolkit.dll" HashGuid="f954329d-f40a-4c5f-1734-127e969f3d24" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\mytoolkit.extended.2.3.31.0\lib\portable-wpa81+win8\mytoolkit.extended.dll" HashGuid="146a9e74-41ed-555a-91a5-4a0ce1c19c4b" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\oxyplot.core.1.0.0-unstable2063\lib\portable-net45+netcore45+wpa81+wp8+monoandroid1+monotouch1+xamarin.ios10\oxyplot.dll" HashGuid="676f7295-bef8-e056-3a3d-943541c6be5a" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\oxyplot.windows.1.0.0-unstable2063\lib\portable-windows8+wpa81\oxyplot.windows.dll" HashGuid="6eb7e276-8e5d-d337-9018-f8aeed093636" />
+    <ReferenceAssembly PathName="c:\users\khmelenko\desktop\новая папка\countersuniversal2\packages\yaaf.portable.text.encoding.0.7.0.0\lib\portable-net45+netcore45+wpa81+wp8+monoandroid1+monotouch1\portable.text.encoding.dll" HashGuid="c3c0ac75-17ed-968d-5a7c-b51769543d1e" />
+  </ReferenceAssemblyList>
+</XamlCompilerSaveState>

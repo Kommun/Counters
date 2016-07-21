@@ -1,0 +1,60 @@
+﻿<paging:MtPage
+    x:Class="Counters.Settings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Counters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:paging="using:MyToolkit.Paging"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Tag="Настройки">
+
+    <paging:MtPage.Resources>
+
+        <local:AppSettings x:Key="settings"/>
+
+        <DataTemplate x:Key="tbPageFull">
+            <TextBlock Text="{Binding Title}" Margin="10,5" FontSize="30" FontWeight="SemiBold"/>
+        </DataTemplate>
+
+    </paging:MtPage.Resources>
+
+    <Grid Width="300" VerticalAlignment="Center" Grid.Column="1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Валюта" Foreground="Gray" FontSize="17"/>
+            <TextBox Name="tbCurrency"/>
+            <TextBlock Text="Автоматически сохранять резервную копию" Foreground="Gray" Margin="0,30,0,0"
+                       FontSize="17" TextWrapping="Wrap"/>
+            <ToggleSwitch x:ConnectionId='1' Name="btnSaveBackupOnExit" IsOn="{Binding SaveBackupOnExit, Source={StaticResource settings}, Mode=TwoWay}"
+                              IsEnabled="{Binding IsFullVersion, Source={StaticResource settings}}"                                      />
+            <TextBlock Text="Изменять положение экрана" Foreground="Gray" Margin="0,10,0,0" FontSize="17"/>
+            <ToggleSwitch Name="btnOrientation"
+                          IsOn="{Binding AllowOrientation, Source={StaticResource settings}, Mode=TwoWay}"/>
+            <TextBlock Text="Стартовая страница" Foreground="Gray" Margin="0,10,0,0" FontSize="17"/>
+            <ComboBox Name="tbPage" DisplayMemberPath="Title">
+                <ComboBox.ItemsSource>
+                    <local:MainMenuItems>
+                        <local:MainMenuItem ImgSource="/Images/MainMenu/counters.png" Title="Счетчики" Page="Counters.Counters"/>
+                        <local:MainMenuItem ImgSource="/Images/MainMenu/services.png" Title="Услуги" Page="Counters.Services"/>
+
+                        <local:MainMenuItem ImgSource="/Images/MainMenu/scores.png" Title="Счета" Page="Counters.Scores"/>
+                        <local:MainMenuItem ImgSource="/Images/MainMenu/charts.png" Title="Графики" Page="Counters.Charts"/>
+
+                        <local:MainMenuItem ImgSource="/Images/MainMenu/alarm.png" Title="Напоминания" Page="Counters.Notifications"/>
+                        <local:MainMenuItem ImgSource="/Images/MainMenu/email.png" Title="Экспорт" Page="Counters.Export" />
+
+                        <local:MainMenuItem ImgSource="/Images/MainMenu/settings.png" Title="Настройки" Page="Counters.Settings"/>
+                    </local:MainMenuItems>
+                </ComboBox.ItemsSource>
+            </ComboBox>
+        </StackPanel>
+    </Grid>
+
+</paging:MtPage>
+

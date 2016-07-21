@@ -1,0 +1,32 @@
+﻿<paging:MtPage
+    x:Class="Counters.AddNotification"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Counters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="using:WinRTXamlToolkit.Controls"
+    xmlns:paging="using:MyToolkit.Paging"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Width="400" VerticalAlignment="Center">
+        <StackPanel Name="spNotification" Margin="20,50" HorizontalAlignment="Stretch">
+            <TextBlock Text="Дата" Foreground="Gray" FontSize="17"/>
+            <DatePicker Name="dpDay"/>
+            <TextBlock Text="Время" Foreground="Gray" Margin="0,10,0,0" FontSize="17"/>
+            <TimePicker Name="tpTime"/>
+            <TextBlock Text="Текст напоминания" Foreground="Gray" Margin="0,10,0,0" FontSize="17"/>
+            <TextBox Name="tbMessage" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding Message, FallbackValue=Снять показания счетчиков}"/>
+            <TextBlock Text="Повторять ежемесячно" Foreground="Gray" Margin="0,10,0,-10" FontSize="17"/>
+            <ToggleSwitch Name="tsRepeat" IsOn="{Binding IsRepeatable,FallbackValue=true}"/>
+        </StackPanel>
+    </Grid>
+
+    <paging:MtPage.BottomAppBar>
+        <AppBar>
+            <AppBarButton Name="btnSave" Label="Сохранить" Icon="Accept" Click="btnSave_Click"/>
+        </AppBar>
+    </paging:MtPage.BottomAppBar>
+
+</paging:MtPage>

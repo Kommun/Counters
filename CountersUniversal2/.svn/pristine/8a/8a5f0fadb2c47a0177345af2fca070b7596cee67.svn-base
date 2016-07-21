@@ -1,0 +1,165 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
+using Windows.UI.Popups;
+using SQLite;
+using Windows.ApplicationModel.Store;
+using Windows.System;
+
+namespace Counters
+{
+    public sealed partial class MainPage : Page
+    {
+        private AppSettings _settings;
+
+        public MainPage()
+        {
+            this.InitializeComponent();
+        }
+
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            _settings = Resources["settings"] as AppSettings;
+            if (_settings.NotRated && _settings.Runs == 4)
+            {
+                MessageDialog msgbox = new MessageDialog("Вы пользуетесь приложением уже достаточно долго. Не могли бы Вы оставить о нем отзыв?");
+
+                msgbox.Commands.Add(new UICommand("Да", async c =>
+                {
+                    await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-windows-store:reviewapp?appid=" + CurrentApp.AppId));
+                    _settings.NotRated = false;
+                }));
+                msgbox.Commands.Add(new UICommand("Нет"));
+
+                await msgbox.ShowAsync();
+
+                _settings.Runs = 0;
+            }
+
+            if (CurrentApp.LicenseInformation.ProductLicenses["FullVersion"].IsActive)
+                _settings.IsFullVersion = true;
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Переходим на стартовую страницу
+            await frameContent.NavigateAsync(Type.GetType(_settings.DefaultPageType));
+            // Регистрируем фоновую задачу
+            await BackgroundTaskManager.RegisterBackgroundTask();
+
+            if (!_settings.IsFullVersion)
+                return;
+
+            var backups = await LiveLogin.GetOrderedBackups();
+            if (backups != null && backups.First().CreationDate > DateTime.Parse(_settings.LastBackupDate))
+            {
+                var msgbox = new MessageDialog("Обнаружена новая резервная копия. Восстановить данные?");
+
+                msgbox.Commands.Add(new UICommand("Да", async c =>
+                {
+                    var appBar = frameContent.CurrentPage.Page.BottomAppBar;
+                    if (appBar != null)
+                        appBar.Visibility = Visibility.Collapsed;
+
+                    await new OneDriveHelper().RestoreAsync();
+
+                    if (appBar != null)
+                        appBar.Visibility = Visibility.Visible;
+                }));
+                msgbox.Commands.Add(new UICommand("Нет"));
+
+                await msgbox.ShowAsync();
+                _settings.LastBackupDate = backups.First().CreationDate.ToString();
+            }
+        }
+
+        private void frameContent_Navigated(object sender, MyToolkit.Paging.MtNavigationEventArgs e)
+        {
+            var addPages = new List<Type> { typeof(AddCounter), typeof(AddData), typeof(AddFlat), typeof(AddNotification), typeof(AddScore), typeof(AddService) };
+            var notAddPage = addPages.IndexOf(frameContent.CurrentPage.Type) == -1;
+            mainMenu.Visibility = notAddPage ? Visibility.Visible : Visibility.Collapsed;
+
+            var appBar = frameContent.CurrentPage.Page.BottomAppBar;
+            if (appBar != null)
+            {
+                appBar.Style = Resources["appBarStyle"] as Style;
+                appBar.Margin = new Thickness(mainMenu.Visibility == Visibility.Visible ? mainMenu.ActualWidth : 0, 0, 0, 0);
+            }
+            var currentFlat = global.db.Query<Flat>("select * From Flat where FlatID=?", _settings.CurrentFlatId).FirstOrDefault();
+            if (currentFlat == null)
+            {
+                currentFlat = global.db.Query<Flat>("select * From Flat").FirstOrDefault();
+                _settings.CurrentFlatId = currentFlat.FlatId;
+            }
+            btnFlats.Text = currentFlat.Name;
+            var header = frameContent.CurrentPage.Page.Tag;
+            if (header != null)
+                tbHeader.Text = header.ToString();
+            btnBack.IsEnabled = frameContent.CanGoBack;
+        }
+
+        private async void btnMailTo_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri(string.Format("mailto:f11kostya@hotmail.com?subject={0}", "Отзыв на приложение \"Коммуналка\"")));
+        }
+
+        private async void btnFeedback_Click(object sender, RoutedEventArgs e)
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-windows-store:reviewapp?appid=" + CurrentApp.AppId));
+            _settings.NotRated = false;
+        }
+
+        private async void btnFlats_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            await frameContent.NavigateAsync(typeof(Flats));
+        }
+
+        private async void btnBuy_Click(object sender, RoutedEventArgs e)
+        {
+            if (!CurrentApp.LicenseInformation.ProductLicenses["FullVersion"].IsActive)
+            {
+                try
+                {
+                    var result = await CurrentApp.RequestProductPurchaseAsync("FullVersion");
+                    if (result.Status == ProductPurchaseStatus.Succeeded)
+                        _settings.IsFullVersion = true;
+                }
+                catch { }
+            }
+            else _settings.IsFullVersion = true;
+        }
+
+        private async void btnBack_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await frameContent.GoBackAsync();
+            }
+            catch { }
+        }
+
+        private async void grdData_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            frameContent.IsEnabled = true;
+
+            var selectedItem = (sender as Grid).DataContext as MainMenuItem;
+            await frameContent.NavigateAsync(Type.GetType(selectedItem.Page));
+            if (selectedItem.IsLocked)
+            {
+                frameContent.IsEnabled = false;
+                await new MessageDialog("Данный раздел доступен только в полной версии приложения.").ShowAsync();
+            }
+        }
+    }
+}

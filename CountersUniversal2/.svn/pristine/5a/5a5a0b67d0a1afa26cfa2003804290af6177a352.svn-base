@@ -1,0 +1,83 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
+using Windows.UI.Popups;
+
+namespace Counters
+{
+
+    public sealed partial class Scores : MyToolkit.Paging.MtPage
+    {
+        Score selectedScore;
+        AppSettings settings = new AppSettings();
+
+        public Scores()
+        {
+            this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(MyToolkit.Paging.MtNavigationEventArgs e)
+        {
+            refreshScores();
+        }
+
+        private void refreshScores()
+        {
+            lbScores.ItemsSource = global.db.Query<Score>(string.Format("select * from Score where Score.FlatId={0} order by Date", settings.CurrentFlatId));
+        }
+
+        private async void btnAdd_Click(object sender, RoutedEventArgs e)
+        {
+            if (global.db.ExecuteScalar<int>(string.Format("Select c+s from (select count(*) as c from Counter where FlatId={0}),"
+                + " (Select count(*) as s from Service where FlatId={0})", settings.CurrentFlatId)) == 0)
+                await new MessageDialog("Для начала добавьте хотя бы один счетчик или услугу").ShowAsync();
+            else
+                await Frame.NavigateAsync(typeof(AddScore), 0);
+        }
+
+        private async void grdData_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            await Frame.NavigateAsync(typeof(AddScore), ((sender as Grid).DataContext as Score).ScoreId);
+        }
+
+        private void grdData_Holding(object sender, HoldingRoutedEventArgs e)
+        {
+            FrameworkElement senderElement = sender as FrameworkElement;
+            FlyoutBase.ShowAttachedFlyout(senderElement);
+            selectedScore = senderElement.DataContext as Score;
+        }
+
+        private async void btnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            MessageDialog msgbox = new MessageDialog("Вы действительно хотите удалить счет? Все связанные показания также будут удалены.");
+
+            msgbox.Commands.Add(new UICommand("Да", c =>
+            {
+                if (selectedScore != null)
+                {
+                    var datas = global.db.Query<CounterData>("Select * from CounterData where ScoreId=?", selectedScore.ScoreId);
+                    foreach (var d in datas)
+                    {
+                        global.db.Execute("Update CounterData set NextDataId=null where NextDataId=?", d.DataId);
+                        global.db.Delete<CounterData>(d.DataId);
+                    }
+                    global.db.Delete(selectedScore);
+                    refreshScores();
+                }
+            }));
+            msgbox.Commands.Add(new UICommand("Нет"));
+            await msgbox.ShowAsync();
+        }
+    }
+}

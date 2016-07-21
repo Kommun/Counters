@@ -1,0 +1,28 @@
+﻿<paging:MtPage
+    x:Class="Counters.AddFlat"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Counters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:paging="using:MyToolkit.Paging"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel Name="spFlat" Width="400" VerticalAlignment="Center">
+        <TextBlock Text="Название" Foreground="Gray" FontSize="17"/>
+        <TextBox Name="tbName" Text="{Binding Name}"/>
+        <TextBlock Text="Адрес" Foreground="Gray" Margin="0,10,0,0" FontSize="17"/>
+        <TextBox Name="tbAdress" Text="{Binding Adress}"/>
+    </StackPanel>
+
+    <paging:MtPage.BottomAppBar>
+        <AppBar>
+            <StackPanel Orientation="Horizontal">
+                <AppBarButton x:ConnectionId='1' Name="btnSave" Label="Сохранить" Icon="Accept"                      />
+            </StackPanel>
+        </AppBar>
+    </paging:MtPage.BottomAppBar>
+
+</paging:MtPage>
+

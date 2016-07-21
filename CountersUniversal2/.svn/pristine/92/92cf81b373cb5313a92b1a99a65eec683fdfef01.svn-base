@@ -1,0 +1,54 @@
+﻿<paging:MtPage
+    x:Class="Counters.Data"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Counters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:paging="using:MyToolkit.Paging"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <paging:MtPage.Resources>
+
+        <DataTemplate x:Key="lbiData">
+            <Grid Margin="0,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid Height="60" Width="60" Margin="0,0,20,0" Grid.RowSpan="2" VerticalAlignment="Center">
+                    <Border Background="{Binding IconColor}" CornerRadius="10">
+                        <Image Source="{Binding Icon}" Margin="5"/>
+                    </Border>
+                </Grid>
+                <TextBlock Text="{Binding stringDate}" FontSize="18" Grid.Column="1"/>
+                <TextBlock Text="{Binding stringFullSumm}" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18" Grid.Column="1"/>
+                <TextBlock Text="{Binding stringDataWithDelta}" FontWeight="Bold" FontSize="18" Grid.Column="1" Grid.Row="1"/>
+                <TextBlock Text="{Binding stringSumm}" HorizontalAlignment="Right" FontSize="18" Grid.Column="1" Grid.Row="1"/>
+            </Grid>
+        </DataTemplate>
+
+    </paging:MtPage.Resources>
+
+    <ListView Name="lbData" ItemTemplate="{StaticResource lbiData}" ItemContainerStyle="{StaticResource selectionContainerStyle}"
+              SelectionChanged="lbData_SelectionChanged"/>
+
+    <paging:MtPage.BottomAppBar>
+        <CommandBar>
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Name="btnAdd" Label="Добавить" Icon="Add" Click="btnAdd_Click"/>
+                <AppBarButton Name="btnChange" Label="Изменить" Icon="Edit" IsEnabled="False" Click="btnChange_Click"/>
+                <AppBarButton Name="btnDelete" Label="Удалить" Icon="Cancel" IsEnabled="False" Click="btnDelete_Click"/>
+            </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Name="btnDeleteAll" Label="Удалить все показания" Click="btnDeleteAll_Click"/>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </paging:MtPage.BottomAppBar>
+
+</paging:MtPage>

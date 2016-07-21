@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<packages>
+  <package id="DrawerLayout" version="1.0.4" targetFramework="wpa81" />
+  <package id="LiveSDK" version="5.6.2" targetFramework="wpa81" />
+  <package id="Microsoft.ApplicationInsights" version="1.1.0" targetFramework="wpa81" />
+  <package id="Microsoft.ApplicationInsights.PersistenceChannel" version="1.1.0" targetFramework="wpa81" />
+  <package id="Microsoft.ApplicationInsights.WindowsApps" version="1.1.0" targetFramework="wpa81" />
+  <package id="MyToolkit" version="2.3.31.0" targetFramework="wpa81" />
+  <package id="MyToolkit.Extended" version="2.3.31.0" targetFramework="wpa81" />
+  <package id="OxyPlot.Core" version="1.0.0-unstable2063" targetFramework="wpa81" />
+  <package id="OxyPlot.Windows" version="1.0.0-unstable2063" targetFramework="wpa81" />
+  <package id="WindowsAzure.Messaging.Managed" version="0.1.7.9" targetFramework="wpa81" />
+  <package id="Yaaf.Portable.Text.Encoding" version="0.7.0.0" targetFramework="wpa81" />
+</packages>

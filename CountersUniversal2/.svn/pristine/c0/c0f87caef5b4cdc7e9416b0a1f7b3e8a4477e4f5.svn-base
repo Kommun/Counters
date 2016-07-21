@@ -1,0 +1,176 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
+using Windows.UI.Popups;
+
+using OxyPlot;
+using OxyPlot.Series;
+using OxyPlot.Axes;
+
+
+namespace Counters
+{
+    public sealed partial class Chart : MyToolkit.Paging.MtPage
+    {
+        MenuItem selectedChart;
+        Counter selectedCounter;
+        ChartSettingsParameter settings = new ChartSettingsParameter();
+
+        public Chart()
+        {
+            this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(MyToolkit.Paging.MtNavigationEventArgs e)
+        {
+            try
+            {
+                if (e.NavigationMode == NavigationMode.New)
+                {
+                    if (e.Parameter != null)
+                        selectedChart = (MenuItem)e.Parameter;
+
+                    var counters = global.db.Query<Counter>("Select Name,CounterId from Counter");
+                    if (selectedChart.Type == 1 || selectedChart.Type == 2)
+                        counters.Insert(0, new Counter() { CounterId = 0, Name = "Все" });
+                    tbCounters.ItemsSource = counters;
+                    tbCounters.SelectedIndex = 0;
+                }
+
+                tbCounters_SelectionChanged(null, null);
+                Tag = selectedChart.Title;
+            }
+            catch (Exception ex)
+            {
+                new MessageDialog(ex.Message).ShowAsync();
+                Frame.GoBackAsync();
+            }
+        }
+
+        private void makeChart()
+        {
+            switch (selectedChart.Type)
+            {
+                case 0:
+                    tbCounters.Visibility = Visibility.Collapsed;
+                    makePieChart();
+                    break;
+                case 1:
+                    parametrizedQuery("Summ");
+                    break;
+                case 2:
+                    parametrizedQuery("Delta");
+                    break;
+                case 3:
+                    makeSingleChart(string.Format("select Date, Tariff as Value from CounterData join Tarif on CounterData.TariffId=Tarif.TariffId"
+                    + " where CounterId={0} and (Date between '{1}' and '{2}') order by Date", selectedCounter.CounterId, settings.bDate, settings.eDate));
+                    break;
+                case 4:
+                    tbCounters.Visibility = Visibility.Collapsed;
+                    makeSingleChart(string.Format("select Date,Data as Value from Score where Date between '{0}' and '{1}' order by Date", settings.bDate, settings.eDate), "MMM yyyy");
+                    break;
+            }
+        }
+
+        private void parametrizedQuery(string parameter)
+        {
+            if (selectedCounter.CounterId == 0)
+                makeMultiChart(parameter);
+            else makeSingleChart(string.Format("select Date,{0} as Value from CounterData where CounterId={1} and (Date between '{2}' and '{3}') order by Date",
+                parameter, selectedCounter.CounterId, settings.bDate, settings.eDate));
+        }
+
+        private void makeMultiChart(string parameter)
+        {
+            var model = new PlotModel();
+            var data = global.db.Query<LineData>(string.Format("select strftime(\"%m-%Y\", Date) as Date,"
+                                    + "(select sum({0}) from CounterData cd2 join Counter c on cd2.CounterId=c.CounterId"
+                                    + " where TypeId=1 and strftime(\"%m-%Y\", cd2.Date)=strftime(\"%m-%Y\", cd.Date)) as cold,"
+                                    + "(select sum({0}) from CounterData cd2 join Counter c on cd2.CounterId=c.CounterId"
+                                    + " where TypeId=2 and strftime(\"%m-%Y\", cd2.Date)=strftime(\"%m-%Y\", cd.Date)) as hot,"
+                                    + "(select sum({0}) from CounterData cd2 join Counter c on cd2.CounterId=c.CounterId"
+                                    + " where TypeId=3 and strftime(\"%m-%Y\", cd2.Date)=strftime(\"%m-%Y\", cd.Date)) as energy,"
+                                    + "(select sum({0}) from CounterData cd2 join Counter c on cd2.CounterId=c.CounterId"
+                                    + " where TypeId=4 and strftime(\"%m-%Y\", cd2.Date)=strftime(\"%m-%Y\", cd.Date)) as gas,"
+                                    + "(select sum({0}) from CounterData cd2 join Counter c on cd2.CounterId=c.CounterId"
+                                    + " where TypeId=5 and strftime(\"%m-%Y\", cd2.Date)=strftime(\"%m-%Y\", cd.Date)) as heat"
+                                    + " from CounterData as cd where Date between '{1}' and '{2}' group by Date order by Date", parameter, settings.bDate, settings.eDate));
+            if (data.Count > 0)
+                data.RemoveAt(0);
+            model.Axes.Add(new DateTimeAxis() { StringFormat = "MMM yyyy", Angle = 45 });
+            model.Series.Add(new LineSeries() { DataFieldX = "Date", DataFieldY = "cold", ItemsSource = data, MarkerType = MarkerType.Circle, Title = "Холодная вода" });
+            model.Series.Add(new LineSeries() { DataFieldX = "Date", DataFieldY = "hot", ItemsSource = data, MarkerType = MarkerType.Circle, Title = "Горячая вода" });
+            model.Series.Add(new LineSeries() { DataFieldX = "Date", DataFieldY = "energy", ItemsSource = data, MarkerType = MarkerType.Circle, Title = "Электричество" });
+            model.Series.Add(new LineSeries() { DataFieldX = "Date", DataFieldY = "gas", ItemsSource = data, MarkerType = MarkerType.Circle, Title = "Газ" });
+            model.Series.Add(new LineSeries() { DataFieldX = "Date", DataFieldY = "heat", ItemsSource = data, MarkerType = MarkerType.Circle, Title = "Отопление" });
+            chart.Model = model;
+        }
+
+        private void makePieChart()
+        {
+            var model = new PlotModel { PlotMargins = new OxyThickness(50) };
+            var ps = new PieSeries();
+            ps.Slices = global.db.Query<PieSlice>("Select min(Name) as Label,sum(Summ) as Value from Counter left join CounterData on Counter.CounterId=CounterData.CounterId"
+                + " group by Counter.CounterId");
+            model.Series.Add(ps);
+            chart.Model = model;
+        }
+
+        private void makeSingleChart(string query, string dateFormat = "dd MM yyyy", bool deleteFirstPoint = true)
+        {
+            var model = new PlotModel();
+            var data = global.db.Query<SingleData>(query);
+
+            if (new AppSettings().PlotType == 0)
+            {
+                model.Axes.Add(new DateTimeAxis() { StringFormat = dateFormat, Angle = 45 });
+                model.Series.Add(new LineSeries() { DataFieldX = "Date", DataFieldY = "Value", ItemsSource = data, MarkerType = MarkerType.Circle });
+            }
+            else
+            {
+                model.Axes.Add(new CategoryAxis { ItemsSource = data, LabelField = "Date", StringFormat = dateFormat, Angle = 45 });
+                model.Axes.Add(new LinearAxis { MaximumPadding = 0.05, AbsoluteMinimum = 0 });
+                model.Series.Add(new ColumnSeries() { ItemsSource = data, ValueField = "Value", LabelFormatString = "{0:F2}", ColumnWidth = 50 });
+            }
+            chart.Model = model;
+        }
+
+        private void tbCounters_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selectedCounter = tbCounters.SelectedItem as Counter;
+            makeChart();
+        }
+
+        private async void btnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            settings.ChartType = selectedChart.Type;
+            await Frame.NavigateAsync(typeof(ChartSettings), settings);
+        }
+    }
+    public class SingleData
+    {
+        public DateTime Date { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class LineData
+    {
+        public DateTime Date { get; set; }
+        public double cold { get; set; }
+        public double hot { get; set; }
+        public double energy { get; set; }
+        public double gas { get; set; }
+        public double heat { get; set; }
+    }
+}

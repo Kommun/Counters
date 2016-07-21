@@ -1,0 +1,158 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
+using Windows.UI.Popups;
+
+namespace Counters
+{
+    public sealed partial class AddService : MyToolkit.Paging.MtPage
+    {
+        int id;
+        AppSettings settings = new AppSettings();
+
+        public AddService()
+        {
+            this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(MyToolkit.Paging.MtNavigationEventArgs e)
+        {
+            try
+            {
+                tbCounters.ItemsSource = global.db.Query<QueryResult>(string.Format("select * from Counter where TypeId in (1,2) and FlatId={0}", settings.CurrentFlatId));
+                id = (int)e.Parameter;
+                if (id != 0)
+                {
+                    var currentService = global.db.Query<ServiceResult>(string.Format("select * from Service join ServiceTarif on Service.TarifId=ServiceTarif.TarifId"
+                        + " where Service.ServiceId={0}", id)).Single();
+                    spService.DataContext = currentService;
+                    tbType.SelectedIndex = currentService.Type;
+                    tbType.IsEnabled = false;
+
+                    var selectedCounters = global.db.Query<QueryResult>(string.Format("select * from Counter where CounterId in ({0})", currentService.lstCounters));
+                    if (currentService.Type == 2)
+                    {
+                        foreach (QueryResult qr in selectedCounters)
+                            tbCounters.SelectedItems.Add(qr);
+                    }
+                    else if (currentService.Type == 3)
+                        tbCounters.SelectedItem = (tbCounters.ItemsSource as List<QueryResult>).FirstOrDefault(c => c.CounterId == selectedCounters.FirstOrDefault().CounterId); ;
+                    tbCounters_SelectionChanged();
+
+                    Tag = currentService.Name;
+                }
+                else
+                {
+                    tbType.SelectedIndex = 0;
+                    Tag = "Новая услуга";
+                }
+            }
+            catch { }
+        }
+
+        private async void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedType = tbType.SelectedIndex;
+            double tarif, count = 0;
+
+            if (tbName.Text == "")
+                invalidData("Введите название услуги", tbName);
+            else if (!double.TryParse(tbTarif.Text.Replace('.', ','), out tarif))
+                invalidData("Тариф содержит недопустимые символы", tbTarif);
+            else if ((selectedType == 1 || selectedType == 3) && !double.TryParse(tbData.Text.Replace('.', ','), out count))
+                invalidData("Поле содержит недопустимые символы", tbData);
+            else if ((selectedType == 2 || selectedType == 3) && (tbCounters.SelectedItems == null || tbCounters.SelectedItems.Count == 0))
+                invalidData("Выберите счетчики");
+            else
+            {
+                var newTarif = new ServiceTarif() { Tarif = tarif };
+                global.db.Insert(newTarif);
+
+                var newService = new Service()
+                    {
+                        FlatId = settings.CurrentFlatId,
+                        Name = tbName.Text,
+                        Type = selectedType,
+                        Data = count,
+                        TarifId = newTarif.TarifId
+                    };
+
+                if (selectedType == 2 || selectedType == 3)
+                    newService.lstCounters = String.Join(",", (tbCounters.SelectedItems.ToList().Cast<QueryResult>()).Select(qr => qr.CounterId));
+
+                if (id != 0)
+                {
+                    newService.ServiceId = id;
+                    global.db.Update(newService);
+                }
+                else
+                    global.db.Insert(newService);
+
+                newTarif.ServiceId = newService.ServiceId;
+                global.db.Update(newTarif);
+
+                await Frame.GoBackAsync();
+            }
+        }
+
+        private async void invalidData(string message, Control tbToFocus = null)
+        {
+            await new MessageDialog(message).ShowAsync();
+            if (tbToFocus != null)
+                tbToFocus.Focus(FocusState.Programmatic);
+
+        }
+
+        private void tbCounters_ItemsPicked(ListPickerFlyout sender, ItemsPickedEventArgs args)
+        {
+            tbCounters_SelectionChanged();
+        }
+
+        private void tbCounters_SelectionChanged()
+        {
+            btnCounters.Content = String.Join(",", (tbCounters.SelectedItems.ToList().Cast<QueryResult>()).Select(qr => qr.Name));
+        }
+
+        private void tbType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                spData.Visibility = Visibility.Collapsed;
+                spCounters.Visibility = Visibility.Collapsed;
+
+                switch (tbType.SelectedIndex)
+                {
+                    case 1:
+                        spData.Visibility = Visibility.Visible;
+                        break;
+                    case 2:
+                        spCounters.Visibility = Visibility.Visible;
+                        tbCounters.SelectionMode = ListPickerFlyoutSelectionMode.Multiple;
+                        break;
+                    case 3:
+                        spData.Visibility = Visibility.Visible;
+                        spCounters.Visibility = Visibility.Visible;
+                        tbCounters.SelectionMode = ListPickerFlyoutSelectionMode.Single;
+                        break;
+                }
+                if (tbCounters.SelectionMode == ListPickerFlyoutSelectionMode.Single)
+                    tbCounters.SelectedIndex = -1;
+                else
+                    tbCounters.SelectedItems.Clear();
+                tbCounters_SelectionChanged();
+            }
+            catch { }
+        }
+    }
+}

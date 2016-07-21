@@ -1,0 +1,41 @@
+﻿<Page
+    x:Class="Counters.Scores"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Counters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+
+        <DataTemplate x:Key="lbiScore">
+            <Grid x:ConnectionId='1' Margin="0,10" Name="grdData"                                                  >
+                <TextBlock Text="{Binding stringDate}" FontSize="25"/>
+                <TextBlock Text="{Binding stringData}" HorizontalAlignment="Right" FontSize="25" FontWeight="Bold"/>
+
+                <FlyoutBase.AttachedFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:ConnectionId='2' x:Name="btnDelete" Text="Удалить"                        />
+                    </MenuFlyout>
+                </FlyoutBase.AttachedFlyout>
+            </Grid>
+        </DataTemplate>
+
+    </Page.Resources>
+
+    <Pivot>
+        <PivotItem Header="Счета">
+            <ListView Name="lbScores" ItemTemplate="{StaticResource lbiScore}" ItemContainerStyle="{StaticResource lbiContainerStyle}"/>
+        </PivotItem>
+    </Pivot>
+
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton x:ConnectionId='3' Name="btnAdd" Label="Добавить" Icon="Add"                     />
+        </CommandBar>
+    </Page.BottomAppBar>
+
+</Page>
+

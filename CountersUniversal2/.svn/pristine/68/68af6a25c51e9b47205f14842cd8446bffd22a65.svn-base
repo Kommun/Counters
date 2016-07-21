@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Files>
+  <file>\Counters8.1.exe</file>
+  <file>\Microsoft.Live.dll</file>
+  <file>\BackgroundTask.winmd</file>
+  <file>\DataBaseHelper.dll</file>
+  <file>\OxyPlot.dll</file>
+  <file>\OxyPlot.Windows.dll</file>
+  <file>\Portable.Text.Encoding.dll</file>
+</Files>

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>8b090246-7400-4621-ac57-0fd7f2db33d2</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Counters</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Classes\global.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classes\HelpClasses.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classes\LiveLogin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classes\QueryResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classes\ServiceResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classes\SQLite.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classes\SQLiteAsync.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Counter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\CounterData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Flat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Notification.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Property.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Score.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Service.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\ServiceData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\ServiceTarif.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Tarif.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\AppSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\BackgroundTaskManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Converters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\OneDriveHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\QueryManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\UpdateManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Images\AppBar\flashlight.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\AppBar\money.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\ButtonImages\contact.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\ButtonImages\exit.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\ButtonImages\menu.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\ButtonImages\rename.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\CounterTypes\energy.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\CounterTypes\gas.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\CounterTypes\heat.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\CounterTypes\moto.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\CounterTypes\water.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\MainMenu\about.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\MainMenu\alarm.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\MainMenu\charts.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\MainMenu\counters.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\MainMenu\email.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\MainMenu\lock.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\MainMenu\scores.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\MainMenu\services.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\MainMenu\settings.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\ServiceTypes\cooler.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\ServiceTypes\fix.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\ServiceTypes\multi.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Images\ServiceTypes\waters.png" />
+  </ItemGroup>
+</Project>

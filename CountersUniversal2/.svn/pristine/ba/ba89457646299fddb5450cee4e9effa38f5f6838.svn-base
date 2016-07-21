@@ -1,0 +1,165 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
+using Windows.UI.Popups;
+using System.Threading.Tasks;
+
+namespace Counters
+{
+    public sealed partial class AddScore : MyToolkit.Paging.MtPage
+    {
+        int id;
+        double Summ;
+        bool allowGoBack;
+        Score currentScore;
+        AppSettings settings = new AppSettings();
+
+        public AddScore()
+        {
+            this.InitializeComponent();
+        }
+
+        protected async override Task OnNavigatingFromAsync(MyToolkit.Paging.MtNavigatingCancelEventArgs e)
+        {
+            if (e.NavigationMode == NavigationMode.Back && id == 0 && !allowGoBack)
+            {
+                MessageDialog msgbox = new MessageDialog("Сохранить счет?");
+                msgbox.Commands.Add(new UICommand("Да", null, 0));
+                msgbox.Commands.Add(new UICommand("Нет", null, 1));
+                var result = await msgbox.ShowAsync();
+
+                if (result == null)
+                    e.Cancel = true;
+                else
+                    switch ((int)result.Id)
+                    {
+                        case 0:
+                            if (!await Save())
+                                e.Cancel = true;
+                            break;
+                        case 1:
+                            App.QueryManager.Connection.Rollback();
+                            break;
+                    }
+            }
+        }
+
+        protected override void OnNavigatedTo(MyToolkit.Paging.MtNavigationEventArgs e)
+        {
+            try
+            {
+                id = (int)e.Parameter;
+
+                if (id != 0)
+                {
+                    currentScore = App.QueryManager.Connection.Get<Score>(id);
+                    tbDate.Date = currentScore.Date;
+                    BottomAppBar.Visibility = Visibility.Collapsed;
+                    Tag = currentScore.stringDate;
+                }
+                else
+                {
+                    //При открытии страницы для создания счета
+                    if (e.NavigationMode == NavigationMode.New)
+                    {
+                        //Начинаем транзакцию
+                        App.QueryManager.Connection.BeginTransaction();
+                        currentScore = new Score() { FlatId = settings.CurrentFlatId };
+                        App.QueryManager.Connection.Insert(currentScore);
+                    }
+                    Tag = "Новый счет";
+                }
+                var counters = App.QueryManager.GetCounterDataByScoreId(id);
+                var services = App.QueryManager.GetServicesByScoreId(id, currentScore.lstServiceTarifs);
+
+                lbCounters.ItemsSource = counters.Select(counter => new CheckedItem() { Item = counter, IsChecked = true }).ToList();
+                lbServices.ItemsSource = services.Select(service => new CheckedItem() { Item = service, IsChecked = true }).ToList();
+
+                refreshSumm();
+            }
+            catch
+            {
+                Frame.GoBackAsync();
+            }
+        }
+
+        private void refreshSumm()
+        {
+            var checkedCounters = ((IEnumerable<CheckedItem>)lbCounters.ItemsSource).Where(ci => ci.IsChecked);
+            var checkedServices = ((IEnumerable<CheckedItem>)lbServices.ItemsSource).Where(ci => ci.IsChecked);
+            grdSumm.Visibility = checkedCounters.Count() + checkedServices.Count() > 0 ? Visibility.Visible : Visibility.Collapsed;
+            Summ = checkedCounters.Sum(ci => (ci.Item as QueryResult).Summ + (ci.Item as QueryResult).SummODN) + checkedServices.Sum(ci => (ci.Item as ServiceResult).Summ);
+            tbSumm.Text = string.Format("{0} {1}", Summ, settings.Currency);
+        }
+
+        private async void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            if (await Save())
+                await Frame.GoBackAsync();
+        }
+
+        private async Task<bool> Save()
+        {
+            if (((IEnumerable<CheckedItem>)lbCounters.ItemsSource).Count(ci => ci.IsChecked) == 0 && ((IEnumerable<CheckedItem>)lbServices.ItemsSource).Count(ci => ci.IsChecked) == 0)
+            {
+                await new MessageDialog("Выберите хотя бы один счетчик или услугу").ShowAsync();
+                return false;
+            }
+            else
+            {
+                currentScore.Date = tbDate.Date.Date;
+                currentScore.lstServiceTarifs = lstServiceTarifs();
+                App.QueryManager.Connection.Update(currentScore);
+                //Завершаем транзакцию
+                App.QueryManager.Connection.Commit();
+                allowGoBack = true;
+                return true;
+            }
+        }
+
+        private string lstServiceTarifs()
+        {
+            return String.Join(", ", ((IEnumerable<CheckedItem>)lbServices.ItemsSource).Where(ci => ci.IsChecked).Select(ci => (ci.Item as ServiceResult).TarifId));
+        }
+
+        private async void grdData_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var selectedItem = (sender as Grid).DataContext as CheckedItem;
+            if (selectedItem.Item is QueryResult)
+                await Frame.NavigateAsync(typeof(AddData), new AddDataParameter()
+                {
+                    CounterId = (selectedItem.Item as QueryResult).CounterId,
+                    DataId = (selectedItem.Item as QueryResult).DataId,
+                    ScoreId = currentScore.ScoreId
+                });
+            else
+                await Frame.NavigateAsync(typeof(AddService), (selectedItem.Item as ServiceResult).ServiceId);
+        }
+
+        private void grdData_Holding(object sender, HoldingRoutedEventArgs e)
+        {
+            if (id == 0 && e.HoldingState == Windows.UI.Input.HoldingState.Started)
+            {
+                var selectedItem = (sender as Grid).DataContext as CheckedItem;
+                selectedItem.IsChecked = !selectedItem.IsChecked;
+                refreshSumm();
+            }
+        }
+
+        private async void btnHelp_Click(object sender, RoutedEventArgs e)
+        {
+            await new MessageDialog("Каждому счету соответствуют показания счетчиков, добавленные в процессе создания счета. Графа ОДН (общедомовые нужны) заполняется при внесении показаний. Если необходимо, чтобы показания не вошли в счет, нажмите на счетчик и удерживайте, пока он не станет неактивным. Редактирование ранее созданных счетов невозможно.").ShowAsync();
+        }
+    }
+}

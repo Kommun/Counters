@@ -1,0 +1,86 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
+using Windows.UI.Popups;
+
+namespace Counters
+{
+
+    public sealed partial class Data : MyToolkit.Paging.MtPage
+    {
+        int id, lastDataId, beginDataId;
+
+        public Data()
+        {
+            this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(MyToolkit.Paging.MtNavigationEventArgs e)
+        {
+            id = (int)e.Parameter;
+            Tag = global.db.Get<Counter>(id).Name;
+            refresh();
+        }
+
+        private void refresh()
+        {
+            var query = global.db.Query<QueryResult>("select * from Counter join CounterData on Counter.CounterId=CounterData.CounterId"
+                + " join Tarif on CounterData.TariffId=Tarif.TariffId where Counter.CounterId=?", id);
+            lastDataId = query.Last().DataId;
+            beginDataId = query.First().DataId;
+            lbData.ItemsSource = query.Reverse<QueryResult>();
+            btnChange.IsEnabled = query.Count() > 1;
+            btnDelete.IsEnabled = query.Count() > 1;
+        }
+
+        private void btnAdd_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.NavigateAsync(typeof(AddData), new AddDataParameter()
+            {
+                CounterId = id,
+                ScoreId = 0,
+                DataId = 0
+            });
+        }
+
+        private void btnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            global.db.Delete<CounterData>(lastDataId);
+            refresh();
+        }
+
+        private void btnChange_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.NavigateAsync(typeof(AddData), new AddDataParameter()
+            {
+                CounterId = id,
+                ScoreId = 0,
+                DataId = lastDataId
+            });
+        }
+
+        private async void btnDeleteAll_Click(object sender, RoutedEventArgs e)
+        {
+            MessageDialog msgbox = new MessageDialog("Вы действительно хотите удалить все показания?");
+
+            msgbox.Commands.Add(new UICommand("Да", c =>
+            {
+                global.db.Execute(string.Format("delete from CounterData where CounterId={0} and DataId<>{1}", id, beginDataId));
+                refresh();
+            }));
+            msgbox.Commands.Add(new UICommand("Нет"));
+            await msgbox.ShowAsync();
+        }
+    }
+}

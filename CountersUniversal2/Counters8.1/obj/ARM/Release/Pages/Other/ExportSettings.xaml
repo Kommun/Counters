@@ -1,0 +1,37 @@
+﻿<paging:MtPage
+    x:Class="Counters.ExportSettings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Counters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:paging="using:MyToolkit.Paging"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Tag="Настройки экспорта">
+
+    <paging:MtPage.Resources>
+
+        <local:AppSettings x:Key="settings"/>
+
+    </paging:MtPage.Resources>
+
+    <ScrollViewer>
+        <StackPanel>
+            <TextBlock Text="Показания" Foreground="Gray" FontSize="17" Margin="0,10,0,0"/>
+            <ToggleSwitch IsOn="{Binding AddData, Source={StaticResource settings}, Mode=TwoWay}"/>
+            <TextBlock Text="Стоимость" Foreground="Gray" FontSize="17" Margin="0,10,0,0"/>
+            <ToggleSwitch IsOn="{Binding AddSumm, Source={StaticResource settings}, Mode=TwoWay}"/>
+            <TextBlock Text="Услуги" Foreground="Gray" FontSize="17" Margin="0,10,0,0"/>
+            <ToggleSwitch IsOn="{Binding AddServices, Source={StaticResource settings}, Mode=TwoWay}"/>
+        </StackPanel>
+    </ScrollViewer>
+
+    <paging:MtPage.BottomAppBar>
+        <CommandBar>
+            <AppBarButton x:ConnectionId='1' Name="btnSave" Label="Сохранить" Icon="Accept"                      />
+        </CommandBar>
+    </paging:MtPage.BottomAppBar>
+
+</paging:MtPage>
+

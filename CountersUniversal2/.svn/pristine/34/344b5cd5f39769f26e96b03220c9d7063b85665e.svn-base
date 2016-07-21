@@ -1,0 +1,122 @@
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SQLite;
+using Windows.Storage;
+using Windows.UI.Notifications;
+using Windows.Data.Xml.Dom;
+using Windows.UI.Xaml.Controls;
+using Windows.Networking.PushNotifications;
+using Microsoft.WindowsAzure.Messaging;
+
+namespace Counters
+{
+    public static class global
+    {
+        public static string db_path = System.IO.Path.Combine(System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "dbCounters.sqlite"));
+        public static SQLiteConnection db;
+        public const string dbVersion = "2.3";
+        public static AppSettings settings = new AppSettings();
+
+        public static void openConnection()
+        {
+            db = new SQLiteConnection(db_path);
+        }
+
+        public static void refreshTile()
+        {
+            try
+            {
+                var badgeXML = BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
+                var badge = badgeXML.SelectSingleNode("/badge") as XmlElement;
+                badge.SetAttribute("value", settings.notificationCountSetting.ToString());
+                var badgeNotification = new BadgeNotification(badgeXML);
+                BadgeUpdateManager.CreateBadgeUpdaterForApplication().Update(badgeNotification);
+            }
+            catch { }
+        }
+
+        public static void showToast(string message)
+        {
+            ToastTemplateType toastTemplate = ToastTemplateType.ToastImageAndText02;
+            XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(toastTemplate);
+            XmlNodeList toastTextElements = toastXml.GetElementsByTagName("text");
+            toastTextElements[0].AppendChild(toastXml.CreateTextNode("Коммуналка"));
+            toastTextElements[1].AppendChild(toastXml.CreateTextNode(message));
+            IXmlNode toastNode = toastXml.SelectSingleNode("/toast");
+            ((XmlElement)toastNode).SetAttribute("duration", "long");
+            ToastNotification toast = new ToastNotification(toastXml);
+            ToastNotificationManager.CreateToastNotifier().Show(toast);
+        }
+
+        public static async void InitNotificationsAsync(List<string> tags)
+        {
+            try
+            {
+                if (settings.IsFullVersion)
+                    tags.Add("FullVersion");
+                var channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
+                var hub = new NotificationHub("CommunalkaPushHub",
+                    "Endpoint=sb://communalkapushhub-ns.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=ke8Shcfe82r3Ox4ZjTg/5gwvlYP1EbXZyIMU8URXBi4=");
+
+                await hub.RegisterNativeAsync(channel.Uri, tags);
+            }
+            catch { }
+        }
+
+        public static bool refreshApp()
+        {
+            try
+            {
+                while (settings.dbVersionSetting != dbVersion)
+                    switch (settings.dbVersionSetting)
+                    {
+                        //12.02.2016
+                        case "2.2":
+                            var query7 = db.Query<CounterData>("select * from CounterData");
+                            db.CreateTable<CounterData>();
+                            foreach (var cd in query7)
+                            {
+                                var nextData = query7.FirstOrDefault(c => c.CounterId == cd.CounterId && c.DataId > cd.DataId);
+                                if (nextData != null)
+                                    cd.NextDataId = nextData.DataId;
+                                db.Update(cd);
+                            }
+
+                            settings.dbVersionSetting = "2.3";
+                            break;
+
+                        default:
+                            global.db.DropTable<Counter>();
+                            global.db.DropTable<CounterData>();
+                            global.db.DropTable<Service>();
+                            global.db.DropTable<ServiceTarif>();
+                            global.db.DropTable<Score>();
+                            global.db.DropTable<Notification>();
+                            global.db.DropTable<Tarif>();
+                            global.db.DropTable<Property>();
+                            global.db.DropTable<Flat>();
+
+                            global.db.CreateTable<Counter>();
+                            global.db.CreateTable<CounterData>();
+                            global.db.CreateTable<Service>();
+                            global.db.CreateTable<ServiceTarif>();
+                            global.db.CreateTable<Score>();
+                            global.db.CreateTable<Notification>();
+                            global.db.CreateTable<Tarif>();
+                            global.db.CreateTable<Property>();
+                            global.db.CreateTable<Flat>();
+                            return false;
+                    }
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+}

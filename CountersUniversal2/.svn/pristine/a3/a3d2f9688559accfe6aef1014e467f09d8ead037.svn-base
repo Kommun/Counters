@@ -1,0 +1,47 @@
+﻿<Page
+    x:Class="Counters.Notifications"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Counters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+
+        <local:AppSettings x:Key="settings"/>
+        <local:BooleanToOpacityConverter x:Key="conv"/>
+
+        <DataTemplate x:Key="lbiNotification">
+            <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Margin="0,10">
+                <Grid Opacity="{Binding Source={StaticResource settings},Path=isRememberOn, Converter={StaticResource conv}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding Date}" FontSize="20"/>
+                    <TextBlock Text="{Binding Message}" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap" Grid.Row="1"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+    </Page.Resources>
+
+    <Pivot>
+        <PivotItem Header="Напоминания">
+            <ListView x:ConnectionId='1' Name="lbNotifications" ItemTemplate="{StaticResource lbiNotification}"
+                 ItemContainerStyle="{StaticResource selectionContainerStyle}"                                                    />
+        </PivotItem>
+    </Pivot>
+
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton x:ConnectionId='2' Name="btnAdd" Label="Добавить" Icon="Add"                     />
+            <AppBarButton x:ConnectionId='3' Name="btnChange" Label="Изменить" Icon="Edit" IsEnabled="False"                        />
+            <AppBarButton x:ConnectionId='4' Name="btnDelete" Label="Удалить" Icon="Cancel" IsEnabled="False"                        />
+        </CommandBar>
+    </Page.BottomAppBar>
+
+</Page>
+

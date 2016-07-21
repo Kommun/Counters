@@ -1,0 +1,122 @@
+﻿<paging:MtPage
+    x:Class="Counters.AddScore"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Counters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:paging="using:MyToolkit.Paging"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <paging:MtPage.Resources>
+
+        <local:BooleanToVisibilityConverter x:Key="conv"/>
+
+        <DataTemplate x:Key="lbiCounter">
+            <Grid Margin="0,10" Name="counter" Tapped="counter_Tapped"
+                  Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid Height="60" Width="60" Margin="0,0,20,0" VerticalAlignment="Center">
+                    <Border Background="{Binding IconColor}" CornerRadius="10">
+                        <Image Source="{Binding Icon}" Margin="5"/>
+                    </Border>
+                </Grid>
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="{Binding Name}" FontSize="25" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding stringDataWithDelta}" FontSize="18"/>
+                    <TextBlock Text="{Binding stringDetailSumm}" FontSize="18"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Visibility="{Binding EnableODN, Converter={StaticResource conv}}">
+                    <TextBlock Text="ОДН" FontSize="25" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding DataODN}" HorizontalAlignment="Right" FontSize="18"/>
+                    <TextBlock Text="{Binding stringSummODN}" HorizontalAlignment="Right" FontSize="18"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="lbiService">
+            <Grid Margin="0,10" Name="service" Tapped="service_Tapped" Opacity="{Binding Opacity}"
+                  Background="Transparent" RightTapped="service_RightTapped">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Height="60" Width="60" Margin="0,0,20,0" Grid.RowSpan="2" VerticalAlignment="Center">
+                    <Border Background="{Binding Item.IconColor}" CornerRadius="10">
+                        <Image Source="{Binding Item.Icon}" Margin="5"/>
+                    </Border>
+                </Grid>
+                <TextBlock Text="{Binding Item.Name}" FontSize="25" Grid.Column="1"/>
+                <TextBlock Text="{Binding Item.stringSumm}" FontSize="20" FontWeight="Bold" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right"/>
+            </Grid>
+        </DataTemplate>
+
+    </paging:MtPage.Resources>
+
+    <Grid Width="700" VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Name="grdDate" Margin="0,10,0,20">
+                <TextBlock Text="Дата" Foreground="Gray" FontSize="17"/>
+                <DatePicker Name="tbDate" DayVisible="False"/>
+            </StackPanel>
+            <ScrollViewer Padding="0,0,20,0"
+                          VerticalScrollBarVisibility="Auto"
+                          Grid.Row="1">
+                <StackPanel>
+                    <ItemsControl Name="lbCounters" ItemTemplate="{StaticResource lbiCounter}" 
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                    <ItemsControl Name="lbServices" ItemTemplate="{StaticResource lbiService}" 
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled" Margin="0,30,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <StackPanel Name="spPayment" Grid.Column="2">
+            <TextBox Name="tbSumm"
+                         Header="Начислено"
+                         IsEnabled="False"/>
+            <TextBox Name="tbRecalculation"
+                         Header="Перерасчет"
+                         Text="{Binding Recalculation}"
+                         InputScope="TelephoneNumber"
+                         TextChanged="tbPayment_TextChanged"/>
+            <TextBox Name="tbPeni"
+                         Header="Пени"
+                         Text="{Binding Peni}"
+                         InputScope="Number"
+                         TextChanged="tbPayment_TextChanged"/>
+            <TextBox Name="tbPaymentSumm"
+                         Header="К оплате"
+                         IsEnabled="False"/>
+        </StackPanel>
+    </Grid>
+
+    <paging:MtPage.BottomAppBar>
+        <AppBar>
+            <StackPanel Orientation="Horizontal">
+                <AppBarButton Name="btnSave" Label="Сохранить" Icon="Accept" Click="btnSave_Click"/>
+                <AppBarButton Name="btnShowEmpty" Label="Показать пустые" Icon="AllApps" Click="btnShowEmpty_Click"/>
+            </StackPanel>
+        </AppBar>
+    </paging:MtPage.BottomAppBar>
+
+</paging:MtPage>

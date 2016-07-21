@@ -1,0 +1,46 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SQLite;
+
+namespace Counters
+{
+    public class Score
+    {
+        private AppSettings settings = new AppSettings();
+
+        [PrimaryKey, AutoIncrement]
+        public int ScoreId { get; set; }
+        public int FlatId { get; set; }
+        public double Data { get; set; }
+        public DateTime Date { get; set; }
+        public string lstServiceTarifs { get; set; }
+
+        //Удалить
+        public string lstDatas { get; set; }
+
+        [Ignore]
+        public string stringDate
+        {
+            get
+            {
+                return Date.ToString("MMMM yyyy");
+            }
+        }
+        [Ignore]
+        public string stringData
+        {
+            get
+            {
+                var counters = global.db.Query<QueryResult>(string.Format("select * from Counter join CounterData on Counter.CounterId=CounterData.CounterId"
+                       + " join Tarif on Counter.TarifId=Tarif.TariffId where ScoreId={0} order by CounterId", ScoreId));
+                var services = global.db.Query<ServiceResult>(string.Format("select *,{0} as ScoreId from Service join ServiceTarif on Service.ServiceId=ServiceTarif.ServiceId"
+                       + " where ServiceTarif.TarifId in ({1})", ScoreId, lstServiceTarifs));
+                var summ = counters.Sum(c => c.Summ + c.SummODN) + services.Sum(s => s.Summ);
+                return string.Format("{0} {1}", Math.Round(summ, 2), settings.Currency);
+            }
+        }
+    }
+}
