@@ -1,3 +1,0 @@
-C:\Users\khmelenko\Desktop\Новая папка\CountersUniversal2\BackgroundTask\BackgroundTask.csproj;arm
-C:\Users\khmelenko\Desktop\Новая папка\CountersUniversal2\Counters8.1\Counters8.1.csproj;arm
-C:\Users\khmelenko\Desktop\Новая папка\CountersUniversal2\DataBaseHelper\DataBaseHelper.csproj;arm
