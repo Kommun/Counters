@@ -29,6 +29,7 @@
                     <MenuFlyout>
                         <MenuFlyoutItem x:Name="btnChange" Text="Изменить" Click="btnChange_Click"/>
                         <MenuFlyoutItem x:Name="btnDelete" Text="Удалить" Click="btnDelete_Click"/>
+                        <MenuFlyoutItem x:Name="btnPin" Text="Закрепить плитку" Click="btnPin_Click"/>
                     </MenuFlyout>
                 </FlyoutBase.AttachedFlyout>
             </Border>

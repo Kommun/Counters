@@ -67,6 +67,8 @@
                 </ListPickerFlyout>
             </Button.Flyout>
         </Button>
+        <ToggleSwitch Header="Открывать список квартир при запуске"
+                      IsOn="{Binding ShowFlatsOnLaunch, Source={StaticResource settings}, Mode=TwoWay}"/>
     </StackPanel>
 
 </paging:MtPage>

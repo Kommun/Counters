@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Notifications;
 using Windows.Data.Xml.Dom;
-using Windows.UI.Xaml.Controls;
 using Windows.Networking.PushNotifications;
 using Microsoft.WindowsAzure.Messaging;
 
@@ -15,19 +14,6 @@ namespace Counters
     public static class global
     {
         public static AppSettings settings = new AppSettings();
-
-        public static void refreshTile()
-        {
-            try
-            {
-                var badgeXML = BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
-                var badge = badgeXML.SelectSingleNode("/badge") as XmlElement;
-                badge.SetAttribute("value", settings.notificationCountSetting.ToString());
-                var badgeNotification = new BadgeNotification(badgeXML);
-                BadgeUpdateManager.CreateBadgeUpdaterForApplication().Update(badgeNotification);
-            }
-            catch { }
-        }
 
         public static void showToast(string message)
         {

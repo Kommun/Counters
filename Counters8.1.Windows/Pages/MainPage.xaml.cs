@@ -40,7 +40,7 @@ namespace Counters
             _settings.notificationCountSetting = 0;
             _settings.NeedToSaveBackup = true;
 
-            global.refreshTile();
+            TileHelper.RefreshTile();
             DisplayInformation.AutoRotationPreferences = _settings.AllowOrientation ? DisplayOrientations.None : DisplayOrientations.Portrait;
 
             var firstLaunch = _settings.isFirstLaunchSetting;
@@ -51,6 +51,10 @@ namespace Counters
 
             // Переходим на стартовую страницу
             await frameContent.NavigateAsync(Type.GetType(_settings.DefaultPageType));
+
+            // Отображаем список квартир, если это установлено в настройках и их больше 1
+            if (_settings.ShowFlatsOnLaunch && App.QueryManager.RowsCount<Flat>() > 1)
+                await frameContent.NavigateAsync(typeof(Flats));
 
             // При первом запуске предлагаем ознакомиться со справкой
             if (firstLaunch && await App.PopupManager.ShowDialogPopupAsync("Вы хотите ознакомиться со справкой? В дальнейшем ее можно будет найти в разделе 'О программе'."))
@@ -81,7 +85,7 @@ namespace Counters
                     await new OneDriveHelper().RestoreAsync();
 
                     if (appBar != null)
-                        appBar.Visibility = Visibility.Visible;                   
+                        appBar.Visibility = Visibility.Visible;
                 }
 
                 _settings.LastBackupDate = backups.First().CreationDate.ToString();
@@ -153,7 +157,7 @@ namespace Counters
                 frameContent.IsEnabled = false;
                 await new MessageDialog("Данный раздел доступен только в полной версии приложения.").ShowAsync();
             }
-        }    
+        }
 
         private async void btnFlats_Tapped(object sender, TappedRoutedEventArgs e)
         {

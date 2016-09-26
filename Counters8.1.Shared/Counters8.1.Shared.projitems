@@ -32,6 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Utils\OneDriveHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\PopupManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\QueryManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\TileHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\UpdateManager.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -42,7 +42,7 @@ namespace BackgroundTaskWin
                                 QueryManager.Instance.Connection.Delete(not);
                             }
                         }
-                global.refreshTile();
+                TileHelper.RefreshTile();
 
                 // Сохраняем резервную копию, если выставлены соответствующие настройки и есть соединение с интернетом
                 if (settings.SaveBackupOnExit && settings.NeedToSaveBackup && NetworkInformation.GetInternetConnectionProfile() != null)

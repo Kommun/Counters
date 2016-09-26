@@ -67,6 +67,8 @@
                     </local:MainMenuItems>
                 </ComboBox.ItemsSource>
             </ComboBox>
+            <ToggleSwitch Header="Открывать список квартир при запуске"
+                          IsOn="{Binding ShowFlatsOnLaunch, Source={StaticResource settings}, Mode=TwoWay}"/>
         </StackPanel>
     </Grid>
 

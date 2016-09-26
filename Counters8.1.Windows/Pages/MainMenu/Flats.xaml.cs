@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Popups;
+using Counters.Utils;
 
 namespace Counters
 {
@@ -66,6 +67,11 @@ namespace Counters
                 await msgbox.ShowAsync();
             }
             else await new MessageDialog("Невозможно удалить единственную квартиру.").ShowAsync();
+        }
+
+        private async void btnPin_Click(object sender, RoutedEventArgs e)
+        {
+            await TileHelper.Pin(selectedFlat);
         }
 
         private async void grdFlat_Tapped(object sender, TappedRoutedEventArgs e)

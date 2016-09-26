@@ -213,8 +213,8 @@ namespace Counters
         /// </summary>
         private void RecalculatePaymentSumm()
         {
-            double.TryParse(tbRecalculation.Text, out recalculation);
-            double.TryParse(tbPeni.Text, out peni);
+            double.TryParse(tbRecalculation.Text.Replace('.', ','), out recalculation);
+            double.TryParse(tbPeni.Text.Replace('.', ','), out peni);
 
             tbPaymentSumm.Text = (Summ + recalculation + peni).ToString();
         }

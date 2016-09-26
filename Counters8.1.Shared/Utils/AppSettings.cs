@@ -75,12 +75,18 @@ namespace Counters
 
         #region SettingsPage
 
+        /// <summary>
+        /// Валюта
+        /// </summary>
         public string Currency
         {
             get { return GetValueOrDefault<string>("Currency", "руб"); }
             set { AddOrUpdateValue("Currency", value); }
         }
 
+        /// <summary>
+        /// Позволять менять ориентацию страницы
+        /// </summary>
         public bool AllowOrientation
         {
             get { return GetValueOrDefault<bool>("AllowOrientation", true); }
@@ -92,16 +98,31 @@ namespace Counters
             }
         }
 
+        /// <summary>
+        /// Включено ли срабатывание напоминаний (не используется)
+        /// </summary>
         public bool isRememberOn
         {
             get { return GetValueOrDefault<bool>("remember", true); }
             set { AddOrUpdateValue("remember", value); }
         }
 
+        /// <summary>
+        /// Стартовая страница
+        /// </summary>
         public string DefaultPageType
         {
             get { return GetValueOrDefault<string>("DefaultPageType", "Counters.Counters"); }
             set { AddOrUpdateValue("DefaultPageType", value); }
+        }
+
+        /// <summary>
+        /// Показывать список квартир при запуске
+        /// </summary>
+        public bool ShowFlatsOnLaunch
+        {
+            get { return GetValueOrDefault<bool>("ShowFlatsOnLaunch", false); }
+            set { AddOrUpdateValue("ShowFlatsOnLaunch", value); }
         }
 
         #endregion

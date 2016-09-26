@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.RegularExpressions;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -26,7 +27,8 @@ namespace Counters
     /// </summary>
     public sealed partial class App : Application
     {
-        public static PopupManager PopupManager { get; set; } = new PopupManager();
+        public static PopupManager PopupManager { get; } = new PopupManager();
+        public static AppSettings Settings { get; } = new AppSettings();
 
         public static QueryManager QueryManager
         {
@@ -46,7 +48,19 @@ namespace Counters
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            global.InitNotificationsAsync(new List<string> { "WP" });            
+            global.InitNotificationsAsync(new List<string> { "WP" });
+           
+            if (!string.IsNullOrWhiteSpace(e.Arguments))
+            {
+                var toastLaunch = Regex.Match(e.Arguments, @"^tile://(?<arguments>.*)$");
+                var toastActivationArgs = toastLaunch.Groups["arguments"];
+                if (toastActivationArgs.Success)
+                {
+                    int tileId;
+                    if (int.TryParse(toastActivationArgs.Value, out tileId))
+                        Settings.CurrentFlatId = tileId;
+                }
+            }
 
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)

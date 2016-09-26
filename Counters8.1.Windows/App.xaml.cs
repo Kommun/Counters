@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -23,7 +24,8 @@ namespace Counters
     /// </summary>
     sealed partial class App : Application
     {
-        public static PopupManager PopupManager { get; set; } = new PopupManager();
+        public static PopupManager PopupManager { get; } = new PopupManager();
+        public static AppSettings Settings { get; } = new AppSettings();
 
         public static QueryManager QueryManager
         {
@@ -38,7 +40,19 @@ namespace Counters
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            global.InitNotificationsAsync(new List<string> { "Win" });        
+            global.InitNotificationsAsync(new List<string> { "Win" });
+
+            if (!string.IsNullOrWhiteSpace(e.Arguments))
+            {
+                var toastLaunch = Regex.Match(e.Arguments, @"^tile://(?<arguments>.*)$");
+                var toastActivationArgs = toastLaunch.Groups["arguments"];
+                if (toastActivationArgs.Success)
+                {
+                    int tileId;
+                    if (int.TryParse(toastActivationArgs.Value, out tileId))
+                        Settings.CurrentFlatId = tileId;
+                }
+            }
 
 #if DEBUG
             // Show graphics profiling information while debugging.
