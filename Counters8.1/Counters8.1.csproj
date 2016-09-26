@@ -182,7 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DrawerLayout">
-      <HintPath>..\..\..\DrawerLayout.dll</HintPath>
+      <HintPath>..\..\..\..\Documents\Visual Studio 2013\Projects\CountersUniversal\Counters8.1\bin\ARM\Debug\DrawerLayout.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ApplicationInsights, Version=1.1.0.1899, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.1.1.0\lib\portable-win81+wpa81\Microsoft.ApplicationInsights.dll</HintPath>

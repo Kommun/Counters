@@ -60,8 +60,16 @@ namespace Counters.Utils
                     switch (_settings.dbVersionSetting)
                     {
                         //8.07.2016
-                        case "2.4":               
-                            _connection.CreateTable<Score>();            
+                        case "2.4":
+                            var scores2 = _connection.Table<Score>().ToList();
+                            _connection.DropTable<Score>();
+                            _connection.CreateTable<Score>();
+                            foreach (var s in scores2)
+                            {
+                                int scoreId = s.ScoreId;
+                                _connection.Insert(s);
+                                _connection.Execute($"Update Score Set ScoreId={scoreId} where ScoreId={s.ScoreId}");
+                            }
                             _settings.dbVersionSetting = "2.5";
                             break;
 

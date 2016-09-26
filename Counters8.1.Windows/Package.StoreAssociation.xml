@@ -380,7 +380,7 @@
     <PackageInfo>
       <OsMinVersion>6.3.0.0</OsMinVersion>
       <PackageArchitecture>x86</PackageArchitecture>
-      <PackageMaxArchitectureVersion>4.4.3.1</PackageMaxArchitectureVersion>
+      <PackageMaxArchitectureVersion>4.4.3.3</PackageMaxArchitectureVersion>
     </PackageInfo>
   </PackageInfoList>
 </StoreAssociation>

@@ -9,7 +9,7 @@ namespace Counters
 {
     public static class UpdateManager
     {
-        public const int CurrentVersion = 5;
+        public const int CurrentVersion = 6;
         private static AppSettings _settings = new AppSettings();
 
         /// <summary>
@@ -27,6 +27,12 @@ namespace Counters
             {
                 switch (i--)
                 {
+                    case 6:
+                        message.AppendLine("V 4.4.3.4");
+                        message.AppendLine("- В настройках появилась возможность включить отображение списка квартир при запуске приложения.");
+                        message.AppendLine("- Добавлена возможность закреплять плитку, соответствующую определенной квартире, на рабочем столе (для быстрого доступа).");
+                        message.AppendLine("- Исправлены ошибки.");
+                        break;
                     case 5:
                         message.AppendLine("V 4.4.3.3");
                         message.AppendLine("- На странице добавления счета появилась вкладка 'Оплата', на которой можно указать сумму перерасчета (в том числе отрицательную), пени и увидеть итоговую сумму к оплате.");
