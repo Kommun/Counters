@@ -66,7 +66,7 @@ namespace Counters
                         s = Tarif * Data * QueryManager.Instance.ServiceDataSources(ScoreId, lstCounters).Sum(qr => qr.Delta);
                         break;
                 }
-                return Math.Round(s, 2);
+                return Math.Round(s, 2, MidpointRounding.AwayFromZero);
             }
         }
         public string stringSumm

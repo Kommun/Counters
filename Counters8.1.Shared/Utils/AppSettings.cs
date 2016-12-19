@@ -153,6 +153,18 @@ namespace Counters
             set { AddOrUpdateValue("phone", value); }
         }
 
+        public int TemplateType
+        {
+            get { return GetValueOrDefault<int>("TemplateType", 0); }
+            set { AddOrUpdateValue("TemplateType", value); }
+        }
+
+        public string Template
+        {
+            get { return GetValueOrDefault<string>("Template", ""); }
+            set { AddOrUpdateValue("Template", value); }
+        }
+
         public bool AddData
         {
             get { return GetValueOrDefault<bool>("AddData", true); }

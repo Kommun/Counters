@@ -43,7 +43,7 @@ namespace Counters
         {
             get
             {
-                return string.Format("{0} {1}", Math.Round(Data, 2), settings.Currency);
+                return string.Format("{0} {1}", Math.Round(Data, 2, MidpointRounding.AwayFromZero), settings.Currency);
             }
         }
 

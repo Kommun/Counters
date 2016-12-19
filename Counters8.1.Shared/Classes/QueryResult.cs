@@ -176,8 +176,8 @@ namespace Counters
             var fullSumm = Calculate(Delta + DataODN, false);
             var summWithoutODN = Calculate(Delta, true);
 
-            _summ = Math.Round(summWithoutODN, 2);
-            SummODN = Math.Round(fullSumm - summWithoutODN, 2);
+            _summ = Math.Round(summWithoutODN, 2, MidpointRounding.AwayFromZero);
+            SummODN = Math.Round(fullSumm - summWithoutODN, 2, MidpointRounding.AwayFromZero);
         }
 
         private double Calculate(double delta, bool saveSumm)
@@ -198,7 +198,7 @@ namespace Counters
 
             var summs = new List<double> { summ3, summ2, summ1 };
             if (saveSumm && summs.Count(s => s > 0) > 1)
-                stringSumm = string.Join(" + ", summs.Where(s => s > 0).Select(s => Math.Round(s, 2).ToString()));
+                stringSumm = string.Join(" + ", summs.Where(s => s > 0).Select(s => Math.Round(s, 2, MidpointRounding.AwayFromZero).ToString()));
 
             return summ1 + summ2 + summ3;
         }
