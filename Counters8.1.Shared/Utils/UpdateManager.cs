@@ -9,7 +9,7 @@ namespace Counters
 {
     public static class UpdateManager
     {
-        public const int CurrentVersion = 6;
+        public const int CurrentVersion = 7;
         private static AppSettings _settings = new AppSettings();
 
         /// <summary>
@@ -27,6 +27,12 @@ namespace Counters
             {
                 switch (i--)
                 {
+                    case 7:
+                        message.AppendLine("V 4.4.3.5");
+                        message.AppendLine("- По многочисленным просьбам пользователей изменен логотип приложения.");
+                        message.AppendLine("- Округление суммы платежей теперь работает корректно(по математическим правилам).");
+                        message.AppendLine("- В настройках экспорта теперь можно установить пользовательский шаблон. Правила его формирования добавлены в справку.");
+                        break;
                     case 6:
                         message.AppendLine("V 4.4.3.4");
                         message.AppendLine("- В настройках появилась возможность включить отображение списка квартир при запуске приложения.");

@@ -13,27 +13,34 @@
     <paging:MtPage.Resources>
 
         <local:AppSettings x:Key="settings"/>
+        <local:NumberComparerConverter x:Key="conv"/>
 
     </paging:MtPage.Resources>
 
     <ScrollViewer>
         <StackPanel>
-            <ComboBox Header="Шаблон"
-                      SelectedIndex="{Binding TemplateType, Source={StaticResource settings}, Mode=TwoWay}">
+            <ComboBox Header="Тип шаблона"
+                      SelectedIndex="{Binding TemplateType, Source={StaticResource settings}, Mode=TwoWay}"
+                      Margin="0,0,0,20">
                 <ComboBox.Items>
                     <ComboBoxItem Content="Стандартный"/>
                     <ComboBoxItem Content="Пользовательский"/>
                 </ComboBox.Items>
             </ComboBox>
-            <TextBox Text="{Binding Template, Source={StaticResource settings}, Mode=TwoWay}"
+            <TextBox Name="tbTemplate"
+                     Header="Шаблон"
+                     TextWrapping="Wrap"
                      AcceptsReturn="True"
-                     TextWrapping="Wrap"/>
-            <TextBlock Text="Показания" Foreground="Gray" FontSize="17" Margin="0,10,0,0"/>
-            <ToggleSwitch IsOn="{Binding AddData, Source={StaticResource settings}, Mode=TwoWay}"/>
-            <TextBlock Text="Стоимость" Foreground="Gray" FontSize="17" Margin="0,10,0,0"/>
-            <ToggleSwitch IsOn="{Binding AddSumm, Source={StaticResource settings}, Mode=TwoWay}"/>
-            <TextBlock Text="Услуги" Foreground="Gray" FontSize="17" Margin="0,10,0,0"/>
-            <ToggleSwitch IsOn="{Binding AddServices, Source={StaticResource settings}, Mode=TwoWay}"/>
+                     Visibility="{Binding TemplateType, Source={StaticResource settings}, Converter={StaticResource conv}, ConverterParameter='1'}"/>
+
+            <StackPanel Visibility="{Binding TemplateType, Source={StaticResource settings}, Converter={StaticResource conv}, ConverterParameter='0'}">
+                <ToggleSwitch IsOn="{Binding AddData, Source={StaticResource settings}, Mode=TwoWay}"
+                              Header="Показания"/>
+                <ToggleSwitch IsOn="{Binding AddSumm, Source={StaticResource settings}, Mode=TwoWay}"
+                              Header="Стоимость"/>
+                <ToggleSwitch IsOn="{Binding AddServices, Source={StaticResource settings}, Mode=TwoWay}"
+                              Header="Услуги"/>
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 

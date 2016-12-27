@@ -75,4 +75,25 @@ namespace Counters
             throw new NotImplementedException();
         }
     }
+
+    public class NumberComparerConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            try
+            {
+                var equal = System.Convert.ToDouble(value) == System.Convert.ToDouble(parameter);
+                return equal ? Visibility.Visible : Visibility.Collapsed;
+            }
+            catch
+            {
+                return Visibility.Collapsed;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
