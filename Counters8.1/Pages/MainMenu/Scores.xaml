@@ -19,6 +19,7 @@
 
                 <FlyoutBase.AttachedFlyout>
                     <MenuFlyout>
+                        <MenuFlyoutItem x:Name="btnChange" Text="Изменить" Click="btnChange_Click"/>
                         <MenuFlyoutItem x:Name="btnDelete" Text="Удалить" Click="btnDelete_Click"/>
                         <MenuFlyoutItem x:Name="btnSendByMail" Text="Отправить по E-mail" Click="btnSendByMail_Click"/>
                         <MenuFlyoutItem x:Name="btnSendBySMS" Text="Отправить по SMS" Click="btnSendBySMS_Click"/>

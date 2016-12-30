@@ -9,7 +9,7 @@ namespace Counters
 {
     public static class UpdateManager
     {
-        public const int CurrentVersion = 7;
+        public const int CurrentVersion = 8;
         private static AppSettings _settings = new AppSettings();
 
         /// <summary>
@@ -27,6 +27,11 @@ namespace Counters
             {
                 switch (i--)
                 {
+                    case 8:
+                        message.AppendLine("V 4.4.3.6");
+                        message.AppendLine("- Открыть счет для редактирования теперь можно только с помощью контекстного меню. В режиме просмотра невозможно изменить данные.");
+                        message.AppendLine("- На странице добавления счета появилось поле 'Комментарий', которое можно заполнить произвольным текстом.");
+                        break;
                     case 7:
                         message.AppendLine("V 4.4.3.5");
                         message.AppendLine("- По многочисленным просьбам пользователей изменен логотип приложения.");

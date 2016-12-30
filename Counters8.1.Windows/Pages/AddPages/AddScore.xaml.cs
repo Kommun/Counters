@@ -20,9 +20,9 @@ namespace Counters
 {
     public sealed partial class AddScore : MyToolkit.Paging.MtPage
     {
-        int id;
+        AddScoreParameter parameter;
         double Summ, recalculation, peni;
-        bool allowGoBack, needToSave, showEmpty;
+        bool allowGoBack;
         Score currentScore;
         AppSettings settings = new AppSettings();
         List<QueryResult> counters;
@@ -44,12 +44,6 @@ namespace Counters
         {
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
-            Loaded += AddScore_Loaded;
-        }
-
-        private void AddScore_Loaded(object sender, RoutedEventArgs e)
-        {
-            refreshSumm();
         }
 
         protected async override Task OnNavigatingFromAsync(MyToolkit.Paging.MtNavigatingCancelEventArgs e)
@@ -57,7 +51,7 @@ namespace Counters
             if (e.NavigationMode != NavigationMode.Back)
                 return;
 
-            if ((id == 0 || needToSave) && !allowGoBack)
+            if (parameter.Change && !allowGoBack)
             {
                 MessageDialog msgbox = new MessageDialog("Сохранить счет?");
                 msgbox.Commands.Add(new UICommand("Да", null, 0));
@@ -83,16 +77,15 @@ namespace Counters
                 if (e.NavigationMode == NavigationMode.New)
                     App.QueryManager.Connection.BeginTransaction();
 
-                id = (int)e.Parameter;
-                if (id != 0)
+                parameter = e.Parameter as AddScoreParameter;
+                if (parameter.ScoreId != 0)
                 {
-                    currentScore = App.QueryManager.Connection.Get<Score>(id);
+                    currentScore = App.QueryManager.Connection.Get<Score>(parameter.ScoreId);
                     tbDate.Date = currentScore.Date;
                     Tag = currentScore.stringDate;
                 }
                 else
                 {
-                    showEmpty = true;
                     //При открытии страницы для создания счета
                     if (e.NavigationMode == NavigationMode.New)
                     {
@@ -108,8 +101,14 @@ namespace Counters
 
                 FilterDatas();
 
-                btnShowEmpty.Visibility = id != 0 && (counters.Count != counters.Where(c => c.DataId != 0).Count()
-                     || services.Count != services.Where(s => s.ServiceDataId != 0).Count()) ? Visibility.Visible : Visibility.Collapsed;
+                if (!parameter.Change)
+                {
+                    spPayment.IsHitTestVisible = false;
+                    lbCounters.IsHitTestVisible = false;
+                    lbServices.IsHitTestVisible = false;
+                    grdDate.Visibility = Visibility.Collapsed;
+                    BottomAppBar.Visibility = Visibility.Collapsed;
+                }
             }
             catch
             {
@@ -119,11 +118,11 @@ namespace Counters
 
         private void FilterDatas()
         {
-            if (showEmpty)
+            if (parameter.Change)
             {
                 lbCounters.ItemsSource = counters;
                 lbServices.ItemsSource = services
-                    .Select(s => new CheckedItem() { Item = s, IsChecked = id == 0 || s.ServiceDataId != 0 }).ToList();
+                    .Select(s => new CheckedItem() { Item = s, IsChecked = parameter.ScoreId == 0 || s.ServiceDataId != 0 }).ToList();
             }
             else
             {
@@ -204,7 +203,6 @@ namespace Counters
                 ServiceId = selectedItem.ServiceId,
                 DataId = selectedItem.ServiceDataId
             });
-            needToSave = true;
         }
 
         private async void counter_Tapped(object sender, TappedRoutedEventArgs e)
@@ -216,7 +214,6 @@ namespace Counters
                 DataId = selectedItem.DataId,
                 ScoreId = currentScore.ScoreId
             });
-            needToSave = true;
         }
 
         private void service_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -224,13 +221,6 @@ namespace Counters
             var selectedItem = (sender as Grid).DataContext as CheckedItem;
             selectedItem.IsChecked = !selectedItem.IsChecked;
             refreshSumm();
-            needToSave = true;
-        }
-
-        private void btnShowEmpty_Click(object sender, RoutedEventArgs e)
-        {
-            showEmpty = !showEmpty;
-            FilterDatas();
         }
     }
 }

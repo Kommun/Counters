@@ -9,7 +9,7 @@ namespace Counters.Utils
 {
     public class QueryManager
     {
-        public const string dbVersion = "2.5";
+        public const string dbVersion = "2.6";
 
         private AppSettings _settings = new AppSettings();
         private string _dbPath = System.IO.Path.Combine(System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "dbCounters.sqlite"));
@@ -59,6 +59,12 @@ namespace Counters.Utils
                 while (_settings.dbVersionSetting != dbVersion)
                     switch (_settings.dbVersionSetting)
                     {
+                        //29.12.2016
+                        case "2.5":
+                            _connection.CreateTable<Score>();
+                            _settings.dbVersionSetting = "2.6";
+                            break;
+
                         //8.07.2016
                         case "2.4":
                             var scores2 = _connection.Table<Score>().ToList();

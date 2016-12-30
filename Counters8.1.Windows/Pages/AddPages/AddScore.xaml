@@ -92,21 +92,25 @@
 
         <StackPanel Name="spPayment" Grid.Column="2">
             <TextBox Name="tbSumm"
-                         Header="Начислено"
-                         IsEnabled="False"/>
+                     Header="Начислено"
+                     IsEnabled="False"/>
             <TextBox Name="tbRecalculation"
-                         Header="Перерасчет"
-                         Text="{Binding Recalculation}"
-                         InputScope="TelephoneNumber"
-                         TextChanged="tbPayment_TextChanged"/>
+                     Header="Перерасчет"
+                     Text="{Binding Recalculation}"
+                     InputScope="TelephoneNumber"
+                     TextChanged="tbPayment_TextChanged"/>
             <TextBox Name="tbPeni"
-                         Header="Пени"
-                         Text="{Binding Peni}"
-                         InputScope="Number"
-                         TextChanged="tbPayment_TextChanged"/>
+                     Header="Пени"
+                     Text="{Binding Peni}"
+                     InputScope="Number"
+                     TextChanged="tbPayment_TextChanged"/>
             <TextBox Name="tbPaymentSumm"
-                         Header="К оплате"
-                         IsEnabled="False"/>
+                     Header="К оплате"
+                     IsEnabled="False"/>
+            <TextBox Text="{Binding Comment, Mode=TwoWay}"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     Header="Комментарий"/>
         </StackPanel>
     </Grid>
 
@@ -114,7 +118,6 @@
         <AppBar>
             <StackPanel Orientation="Horizontal">
                 <AppBarButton Name="btnSave" Label="Сохранить" Icon="Accept" Click="btnSave_Click"/>
-                <AppBarButton Name="btnShowEmpty" Label="Показать пустые" Icon="AllApps" Click="btnShowEmpty_Click"/>
             </StackPanel>
         </AppBar>
     </paging:MtPage.BottomAppBar>

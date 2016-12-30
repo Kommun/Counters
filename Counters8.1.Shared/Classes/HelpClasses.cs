@@ -30,6 +30,12 @@ namespace Counters
         public int ScoreId { get; set; }
     }
 
+    public class AddScoreParameter
+    {
+        public int ScoreId { get; set; }
+        public bool Change { get; set; }
+    }
+
     public class ExportParameter
     {
         public int Type { get; set; }

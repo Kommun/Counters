@@ -42,12 +42,12 @@ namespace Counters
             if (App.QueryManager.DataSourcesCount() == 0)
                 await new MessageDialog("Для начала добавьте хотя бы один счетчик или услугу").ShowAsync();
             else
-                await Frame.NavigateAsync(typeof(AddScore), 0);
+                await Frame.NavigateAsync(typeof(AddScore), new AddScoreParameter { Change = true });
         }
 
         private async void grdData_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            await Frame.NavigateAsync(typeof(AddScore), ((sender as Grid).DataContext as Score).ScoreId);
+            await Frame.NavigateAsync(typeof(AddScore), new AddScoreParameter { ScoreId = ((sender as Grid).DataContext as Score).ScoreId });
         }
 
         private void grdData_Holding(object sender, HoldingRoutedEventArgs e)
@@ -55,6 +55,11 @@ namespace Counters
             FrameworkElement senderElement = sender as FrameworkElement;
             FlyoutBase.ShowAttachedFlyout(senderElement);
             selectedScore = senderElement.DataContext as Score;
+        }
+
+        private async void btnChange_Click(object sender, RoutedEventArgs e)
+        {
+            await Frame.NavigateAsync(typeof(AddScore), new AddScoreParameter { ScoreId = selectedScore.ScoreId, Change = true });
         }
 
         private async void btnDelete_Click(object sender, RoutedEventArgs e)

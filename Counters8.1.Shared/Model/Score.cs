@@ -18,6 +18,7 @@ namespace Counters
         public DateTime Date { get; set; }
         public double Recalculation { get; set; }
         public double Peni { get; set; }
+        public string Comment { get; set; }
 
         [Ignore]
         public double Data
