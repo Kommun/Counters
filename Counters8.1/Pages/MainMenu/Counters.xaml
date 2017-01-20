@@ -67,6 +67,7 @@
                     <BitmapIcon UriSource="ms-appx:///Images/AppBar/money.png"/>
                 </AppBarButton.Icon>
             </AppBarButton>
+            <AppBarButton Name="btnSort" Label="Сортировать" Icon="Sort" Click="btnSort_Click"/>
         </CommandBar>
     </paging:MtPage.BottomAppBar>
 

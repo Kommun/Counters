@@ -9,7 +9,7 @@ namespace Counters.Utils
 {
     public class QueryManager
     {
-        public const string dbVersion = "2.6";
+        public const string dbVersion = "2.7";
 
         private AppSettings _settings = new AppSettings();
         private string _dbPath = System.IO.Path.Combine(System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "dbCounters.sqlite"));
@@ -59,6 +59,33 @@ namespace Counters.Utils
                 while (_settings.dbVersionSetting != dbVersion)
                     switch (_settings.dbVersionSetting)
                     {
+                        //19.01.2017
+                        case "2.6":
+                            var counters = _connection.Table<Counter>().ToList();
+                            _connection.DropTable<Counter>();
+                            _connection.CreateTable<Counter>();
+                            foreach (var c in counters)
+                            {
+                                int counterId = c.CounterId;
+                                c.SortOrder = -1;
+                                _connection.Insert(c);
+                                _connection.Execute($"Update Counter Set CounterId={counterId} where CounterId={c.CounterId}");
+                            }
+
+                            var services = _connection.Table<Service>().ToList();
+                            _connection.DropTable<Service>();
+                            _connection.CreateTable<Service>();
+                            foreach (var s in services)
+                            {
+                                int serviceId = s.ServiceId;
+                                s.SortOrder = -1;
+                                _connection.Insert(s);
+                                _connection.Execute($"Update Service Set ServiceId={serviceId} where ServiceId={s.ServiceId}");
+                            }
+
+                            _settings.dbVersionSetting = "2.7";
+                            break;
+
                         //29.12.2016
                         case "2.5":
                             _connection.CreateTable<Score>();
@@ -284,7 +311,7 @@ namespace Counters.Utils
         {
             return _connection.Query<QueryResult>(string.Format("Select * from (Counter join CounterData on Counter.CounterId=CounterData.CounterId"
                 + " join Tarif on CounterData.TariffId=Tarif.TariffId) cd join (SELECT CounterId, MAX(Date) AS MaxDate FROM CounterData"
-                + " GROUP BY CounterId) tt on cd.CounterId=tt.CounterId and cd.Date=tt.MaxDate where {0} order by Name",
+                + " GROUP BY CounterId) tt on cd.CounterId=tt.CounterId and cd.Date=tt.MaxDate where {0} order by SortOrder,Name",
                 lstCounters == null ? "Counter.FlatId=" + _settings.CurrentFlatId : "Counter.CounterId in (" + lstCounters + ")"));
         }
 
@@ -295,6 +322,18 @@ namespace Counters.Utils
         public List<QueryResult> GetWaterCounters()
         {
             return _connection.Query<QueryResult>(string.Format("select * from Counter where TypeId in (1,2) and FlatId={0} order by Name", _settings.CurrentFlatId));
+        }
+
+        /// <summary>
+        /// Сохранить порядок следования счетчиков
+        /// </summary>
+        /// <param name="counters">Список счетчиков</param>
+        public void SaveCountersOrder(List<QueryResult> counters)
+        {
+            int i = 0;
+
+            foreach (var counter in counters)
+                _connection.Execute(string.Format("Update Counter set SortOrder={0} where CounterId={1}", i++, counter.CounterId));
         }
 
         /// <summary>
@@ -338,7 +377,7 @@ namespace Counters.Utils
         public List<ServiceResult> GetServices()
         {
             return _connection.Query<ServiceResult>("select * from Service join ServiceTarif on Service.TarifId=ServiceTarif.TarifId"
-                + " where Service.FlatId=? order by Name", _settings.CurrentFlatId);
+                + " where Service.FlatId=? order by SortOrder, Name", _settings.CurrentFlatId);
         }
 
         /// <summary>
@@ -379,6 +418,18 @@ namespace Counters.Utils
         }
 
         /// <summary>
+        /// Сохранить порядок следования услуг
+        /// </summary>
+        /// <param name="counters">Список услуг</param>
+        public void SaveServicesOrder(List<ServiceResult> services)
+        {
+            int i = 0;
+
+            foreach (var service in services)
+                _connection.Execute(string.Format("Update Service set SortOrder={0} where ServiceId={1}", i++, service.ServiceId));
+        }
+
+        /// <summary>
         /// Удалить услугу
         /// </summary>
         /// <param name="id">Id услуги</param>
@@ -411,10 +462,10 @@ namespace Counters.Utils
             if (includeEmpty)
                 return _connection.Query<QueryResult>(string.Format("select CounterData.*,Counter.*,Tarif.* from Counter"
                     + " left join CounterData on Counter.CounterId=CounterData.CounterId and ScoreId={0}"
-                    + " left join Tarif on CounterData.TariffId=Tarif.TariffId where FlatId={1} order by DataId=0 desc, Name asc", id, _settings.CurrentFlatId));
+                    + " left join Tarif on CounterData.TariffId=Tarif.TariffId where FlatId={1} order by DataId=0 desc, SortOrder, Name", id, _settings.CurrentFlatId));
             else
                 return _connection.Query<QueryResult>("select * from Counter join CounterData on Counter.CounterId=CounterData.CounterId"
-                    + " join Tarif on CounterData.TariffId=Tarif.TariffId where ScoreId=? order by Name", id);
+                    + " join Tarif on CounterData.TariffId=Tarif.TariffId where ScoreId=? order by SortOrder, Name", id);
         }
 
         /// <summary>
@@ -434,10 +485,10 @@ namespace Counters.Utils
                     + " left join ServiceData on Service.ServiceId=ServiceData.ServiceId and ScoreId={0}"
                     + " left join ServiceTarif st1 on ServiceData.TarifId=st1.TarifId"
                     + " left join ServiceTarif st2 on Service.TarifId = st2.TarifId"
-                    + " where FlatId={1} order by ServiceDataId=0 desc, Name asc", id, _settings.CurrentFlatId));
+                    + " where FlatId={1} order by ServiceDataId=0 desc, SortOrder, Name asc", id, _settings.CurrentFlatId));
             else
                 return _connection.Query<ServiceResult>("select * from Service join ServiceData on Service.ServiceId=ServiceData.ServiceId"
-                        + " join ServiceTarif on ServiceData.TarifId=ServiceTarif.TarifId where ScoreId=? order by Name", id);
+                        + " join ServiceTarif on ServiceData.TarifId=ServiceTarif.TarifId where ScoreId=? order by SortOrder, Name", id);
 
         }
 

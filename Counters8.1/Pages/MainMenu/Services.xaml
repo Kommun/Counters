@@ -13,7 +13,10 @@
     <paging:MtPage.Resources>
 
         <DataTemplate x:Key="lbiService">
-            <Grid Margin="0,10" Name="grdData">
+            <Grid Margin="0,10"
+                  Name="grdData"
+                  Holding="grdData_Holding"
+                  Background="Transparent">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
@@ -29,6 +32,13 @@
                 </Grid>
                 <TextBlock Text="{Binding Name}" FontSize="25" Grid.Column="1"/>
                 <TextBlock Text="{Binding stringSumm}" FontSize="20" FontWeight="Bold" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right"/>
+
+                <FlyoutBase.AttachedFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:Name="btnChange" Text="Изменить" Click="btnChange_Click"/>
+                        <MenuFlyoutItem x:Name="btnDelete" Text="Удалить" Click="btnDelete_Click"/>
+                    </MenuFlyout>
+                </FlyoutBase.AttachedFlyout>
             </Grid>
         </DataTemplate>
 
@@ -39,8 +49,8 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ListView Name="lbServices" ItemTemplate="{StaticResource lbiService}" SelectionChanged="lbServices_SelectionChanged"
-                         ItemContainerStyle="{StaticResource selectionContainerStyle}"/>
+        <ListView Name="lbServices" ItemTemplate="{StaticResource lbiService}"
+                  ItemContainerStyle="{StaticResource lbiContainerStyle}"/>
         <Border Name="grdSumm" Grid.Row="1" BorderThickness="0,2,0,0" BorderBrush="LightGray"  Visibility="Collapsed">
             <Grid>
                 <TextBlock  Text="Итого:" FontSize="25"/>
@@ -52,8 +62,7 @@
     <paging:MtPage.BottomAppBar>
         <CommandBar>
             <AppBarButton Name="btnAdd" Label="Добавить" Icon="Add" Click="btnAdd_Click"/>
-            <AppBarButton Name="btnChange" Label="Изменить" Icon="Edit" IsEnabled="False" Click="btnChange_Click"/>
-            <AppBarButton Name="btnDelete" Label="Удалить" Icon="Cancel" IsEnabled="False" Click="btnDelete_Click"/>
+            <AppBarButton Name="btnSort" Label="Сортировать" Icon="Sort" Click="btnSort_Click"/>
         </CommandBar>
     </paging:MtPage.BottomAppBar>
 

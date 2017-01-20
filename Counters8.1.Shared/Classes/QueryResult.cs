@@ -17,6 +17,7 @@ namespace Counters
         public string Name { get; set; }
         public int TypeId { get; set; }
         public bool EnableODN { get; set; }
+        public int SortOrder { get; set; }
 
         public string CounterType
         {

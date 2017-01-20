@@ -16,5 +16,7 @@ namespace Counters
         public string Name { get; set; }
         public int TarifId { get; set; }
         public bool EnableODN { get; set; }
+
+        public int SortOrder { get; set; } = -1;
     }
 }

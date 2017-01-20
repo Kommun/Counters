@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -31,7 +33,10 @@ namespace Counters
             try
             {
                 var query = App.QueryManager.GetCountersWithLastData();
-                lbCounters.ItemsSource = query;
+                var counters = new ObservableCollection<QueryResult>(query);
+                counters.CollectionChanged += Counters_CollectionChanged;
+                lbCounters.ItemsSource = counters;
+
                 tbSumm.Text = string.Format("{0} {1}", query.Sum(counter => counter.Summ), settings.Currency);
                 tbHelp.Visibility = query.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
                 btnMoney.IsEnabled = query.Count > 0;
@@ -41,6 +46,17 @@ namespace Counters
                 new MessageDialog("Конфигурация базы данных повреждена или устарела").ShowAsync();
                 //App.QueryManager.ClearCounters();
             }
+        }
+
+        /// <summary>
+        /// Обработчик изменения списка счетчиков
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Counters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+                App.QueryManager.SaveCountersOrder((sender as ObservableCollection<QueryResult>).ToList());
         }
 
         protected override void OnNavigatedTo(MyToolkit.Paging.MtNavigationEventArgs e)
@@ -59,7 +75,7 @@ namespace Counters
         private async void btnChange_Click(object sender, RoutedEventArgs e)
         {
             await Frame.NavigateAsync(typeof(AddCounter), new AddCounterParameter()
-                { CounterId = selectedCounter.CounterId });
+            { CounterId = selectedCounter.CounterId });
         }
 
         private async void btnDelete_Click(object sender, RoutedEventArgs e)
@@ -93,6 +109,11 @@ namespace Counters
         private void btnMoney_Click(object sender, RoutedEventArgs e)
         {
             grdSumm.Visibility = grdSumm.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void btnSort_Click(object sender, RoutedEventArgs e)
+        {
+            lbCounters.ReorderMode = lbCounters.ReorderMode == ListViewReorderMode.Disabled ? ListViewReorderMode.Enabled : ListViewReorderMode.Disabled;
         }
     }
 }
