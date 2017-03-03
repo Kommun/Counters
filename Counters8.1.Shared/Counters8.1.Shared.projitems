@@ -16,6 +16,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Classes\ServiceResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Classes\SQLite.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Classes\SQLiteAsync.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\CounterType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\ServiceType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Counter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\CounterData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Flat.cs" />

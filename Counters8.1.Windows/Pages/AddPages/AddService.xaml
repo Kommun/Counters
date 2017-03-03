@@ -36,7 +36,7 @@
                     <local:MenuItems>
                         <local:MenuItem Description="Фиксированная стоимость"/>
                         <local:MenuItem Description="По количеству жильцов/площади"/>
-                        <local:MenuItem Description="Водоотвод"/>
+						<local:MenuItem Description="Водоотведение"/>
                         <local:MenuItem Description="Подогрев воды"/>
                     </local:MenuItems>
                 </ComboBox.ItemsSource>

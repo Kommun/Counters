@@ -7,16 +7,24 @@ using SQLite;
 
 namespace Counters
 {
-    public class Counter
-    {
-        [PrimaryKey, AutoIncrement]
-        public int CounterId { get; set; }
-        public int FlatId { get; set; }
-        public int TypeId { get; set; }
-        public string Name { get; set; }
-        public int TarifId { get; set; }
-        public bool EnableODN { get; set; }
+	public class Counter
+	{
+		[PrimaryKey, AutoIncrement]
+		public int CounterId { get; set; }
+		public int FlatId { get; set; }
+		public int TypeId { get; set; }
+		public string Name { get; set; }
+		public int TarifId { get; set; }
+		public bool EnableODN { get; set; }
 
-        public int SortOrder { get; set; } = -1;
-    }
+		/// <summary>
+		/// Порядок сортировки
+		/// </summary>
+		public int SortOrder { get; set; } = -1;
+
+		/// <summary>
+		/// Коэффициент преобразования единиц измерения
+		/// </summary>
+		public double UnitConvertCoefficient { get; set; }
+	}
 }

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="11115KhmelenkoKonstantin.1546745F55B18" Publisher="CN=97EF5691-F21D-4889-A791-CECFF3E09E15" Version="4.4.3.6" />
+  <Identity Name="11115KhmelenkoKonstantin.1546745F55B18" Publisher="CN=97EF5691-F21D-4889-A791-CECFF3E09E15" Version="4.4.3.8" />
   <Properties>
     <DisplayName>Коммуналка</DisplayName>
     <PublisherDisplayName>Khmelenko Konstantin</PublisherDisplayName>
