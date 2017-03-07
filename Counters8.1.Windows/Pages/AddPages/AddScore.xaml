@@ -76,7 +76,9 @@
             </Grid.RowDefinitions>
             <StackPanel Name="grdDate" Margin="0,10,0,20">
                 <TextBlock Text="Дата" Foreground="Gray" FontSize="17"/>
-                <DatePicker Name="tbDate" DayVisible="False"/>
+                <DatePicker Name="tbDate"
+					DayVisible="False"
+					MonthFormat="{}{month.solo.full}"/>
             </StackPanel>
             <ScrollViewer Padding="0,0,20,0"
                           VerticalScrollBarVisibility="Auto"

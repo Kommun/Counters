@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
+  <Identity Name="11115KhmelenkoKonstantin.1546745F55B18" Publisher="CN=97EF5691-F21D-4889-A791-CECFF3E09E15" Version="4.4.3.9" />
   <mp:PhoneIdentity PhoneProductId="ff05f2f7-70cc-4528-9b7d-ad47a0ce70f1" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Коммуналка</DisplayName>

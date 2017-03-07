@@ -24,13 +24,18 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Button Name="btnCounters" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+		<StackPanel>
+			<TextBlock Name="tbPeriod"
+				HorizontalAlignment="Center"
+				FontSize="20"
+				Margin="0,0,0,10"/>
+			<Button Name="btnCounters" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                 Content="{Binding ElementName=tbCounters, Path=SelectedItem.Name}">
-            <Button.Flyout>
-                <ListPickerFlyout x:Name="tbCounters" Title="Список счетчиков" ItemTemplate="{StaticResource tbCountersFull}" ItemsPicked="tbCounters_ItemsPicked"/>
-            </Button.Flyout>
-        </Button>
-
+				<Button.Flyout>
+					<ListPickerFlyout x:Name="tbCounters" Title="Список счетчиков" ItemTemplate="{StaticResource tbCountersFull}" ItemsPicked="tbCounters_ItemsPicked"/>
+				</Button.Flyout>
+			</Button>
+		</StackPanel>
         <chart:PlotView Name="chart" Grid.Row="1"/>
 
     </Grid>

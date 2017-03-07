@@ -10,21 +10,30 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
 
-        <ComboBox Name="tbCounters" HorizontalAlignment="Stretch" DisplayMemberPath="Name" SelectionChanged="tbCounters_SelectionChanged"/>
-        <chart:PlotView Name="chart" Grid.Row="1"/>
+		<StackPanel>
+			<TextBlock Name="tbPeriod"
+				HorizontalAlignment="Center"
+				FontSize="25"
+				Margin="0,0,0,10"/>
+			<ComboBox Name="tbCounters"
+				HorizontalAlignment="Stretch"
+				DisplayMemberPath="Name"
+				SelectionChanged="tbCounters_SelectionChanged"/>
+		</StackPanel>
+		<chart:PlotView Name="chart" Grid.Row="1"/>
 
-    </Grid>
+	</Grid>
 
-    <paging:MtPage.BottomAppBar>
-        <AppBar>
-            <AppBarButton Name="btnSettings" Label="Настройки" Icon="Setting" Click="btnSettings_Click"/>
-        </AppBar>
-    </paging:MtPage.BottomAppBar>
+	<paging:MtPage.BottomAppBar>
+		<AppBar>
+			<AppBarButton Name="btnSettings" Label="Настройки" Icon="Setting" Click="btnSettings_Click"/>
+		</AppBar>
+	</paging:MtPage.BottomAppBar>
 
 </paging:MtPage>
